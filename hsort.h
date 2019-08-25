@@ -19,6 +19,7 @@ typedef enum hsort_options {
 typedef enum hsort_return {
 	HSORT_RET_SUCCESS    = 0,      /* Success */
 	HSORT_RET_ERROR      = 1 << 0, /* General error */
+	HSORT_RET_INVALIDUSE = 1 << 1, /* Invalid usage */
 } hsort_return_t;
 
 typedef enum hsort_equality {

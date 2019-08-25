@@ -2,6 +2,7 @@
 #define __HSORT_H_
 
 #include <stdlib.h>
+#include <string.h>
 
 
 typedef enum hsort_options {
@@ -27,7 +28,7 @@ typedef enum hsort_equality {
 } hsort_equality_t;
 
 
-typedef hsort_equality_t (*hsort_equality_cb)(void *a, void *b, hsort_options_t options);
+typedef hsort_equality_t (*hsort_equality_cb)(void *left, void *right, hsort_options_t options);
 
 hsort_return_t hsort_int(int64_t *arr, size_t len, hsort_options_t options);
 hsort_return_t hsort_uint(u_int64_t *arr, size_t len, hsort_options_t options);

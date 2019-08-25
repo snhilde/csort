@@ -44,6 +44,9 @@ static hsort_equality_t hsort_str_cb(void *left, void *right, hsort_options_t op
 
 hsort_return_t hsort_custom(void *arr, size_t len, size_t size, hsort_equality_cb cb, hsort_options_t options)
 {
+	if (arr == NULL || len == 0 || size == 0 || cb == NULL || options == 0)
+		return HSORT_RET_INVALIDUSE;
+
 	return HSORT_RET_SUCCESS;
 }
 

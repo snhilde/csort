@@ -47,6 +47,13 @@ hsort_return_t hsort_custom(void *arr, size_t len, size_t size, hsort_equality_c
 	if (arr == NULL || len == 0 || size == 0 || cb == NULL || options == 0)
 		return HSORT_RET_INVALIDUSE;
 
+	if (options & HSORT_ORDER_DESC)
+		/* If Descending is set, make sure Ascending is not also set. */
+		options &= ~HSORT_ORDER_ASC;
+	else
+		/* Default to Ascending. */
+		options |= HSORT_ORDER_ASC;
+
 	return HSORT_RET_SUCCESS;
 }
 

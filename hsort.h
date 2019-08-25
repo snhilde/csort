@@ -15,6 +15,11 @@ typedef enum hsort_options {
 	HSORT_ORDER_DESC     = 1 << 4, /* Descending order */
 } hsort_options_t;
 
+typedef enum hsort_return {
+	HSORT_RET_SUCCESS    = 0,      /* Success */
+	HSORT_RET_ERROR      = 1 << 0, /* General error */
+} hsort_return_t;
+
 typedef enum hsort_equality {
 	HSORT_GT = 1, /* Greater than */
 	HSORT_LT,     /* Less than */

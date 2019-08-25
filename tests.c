@@ -45,10 +45,12 @@ int main(int argc, char *argv[])
 
 	printf("Unsigned integers:\n");
 	print_arr(u_nums, sizeof(u_nums)/sizeof(*u_nums), UINT);
+	hsort_uint(u_nums, sizeof(u_nums)/sizeof(*u_nums), HSORT_INSERTION_SORT|HSORT_ORDER_ASC);
 	printf("\n");
 
 	printf("Characters:\n");
 	print_arr(str, sizeof(str)/sizeof(*str), CHAR);
+	hsort_str(str, HSORT_INSERTION_SORT|HSORT_ORDER_ASC);
 
 	return EXIT_SUCCESS;
 }

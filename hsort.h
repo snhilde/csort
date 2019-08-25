@@ -27,4 +27,9 @@ typedef enum hsort_equality {
 } hsort_equality_t;
 
 
+hsort_return_t hsort_int(int64_t *a, size_t len, hsort_options_t options);
+hsort_return_t hsort_uint(u_int64_t *a, size_t len, hsort_options_t options);
+hsort_return_t hsort_str(char *s, hsort_options_t options);
+
+
 #endif

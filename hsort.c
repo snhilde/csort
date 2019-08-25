@@ -1,7 +1,7 @@
 #include "hsort.h"
 
 
-hsort_return_t hsort_custom(void *arr, size_t len, size_t size, hsort_equality_cb cb)
+hsort_return_t hsort_custom(void *arr, size_t len, size_t size, hsort_equality_cb cb, hsort_options_t options)
 {
 	return HSORT_RET_SUCCESS;
 }

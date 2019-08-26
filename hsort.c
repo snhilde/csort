@@ -143,17 +143,15 @@ static hsort_equality_t hsort_str_cb(void *left, void *right, size_t size, hsort
 /* --- SORTING ALGORITHMS --- */
 static hsort_return_t hsort_insertion(void *arr, size_t len, size_t size, hsort_equality_cb cb, hsort_options_t options)
 {
-	unsigned int i;
-	unsigned int j;
-	void *left;
-	void *right;
+	void *end;
+	void *selection;
+	void *test;
 
-	for (i = 0; i+1 < len; i++) {
-		right = arr + (i+1)*size;
-		for (j = 0; j <= i; j++) {
-			left = arr + j*size;
-			if (cb(left, right, size, options) != HSORT_LT) {
-				hsort_insert(left, right, size);
+	end = arr + (len*size);
+	for (selection = arr+size; selection <= end; selection += size) {
+		for (test = arr; test < selection; test += size) {
+			if (cb(selection, test, size, options) != HSORT_GT) {
+				hsort_insert(test, selection, size);
 				break;
 			}
 		}
@@ -164,18 +162,20 @@ static hsort_return_t hsort_insertion(void *arr, size_t len, size_t size, hsort_
 
 static hsort_return_t hsort_selection(void *arr, size_t len, size_t size, hsort_equality_cb cb, hsort_options_t options)
 {
-	unsigned int  i;
-	unsigned int  j;
-	void         *min;
+	void *end;
+	void *current;
+	void *selection;
+	void *test;
 
-	for (i = 0; i < len-1; i++) {
-		min = arr + (size * i);
-		for (j = i+1; j < len; j++) {
-			if (cb(min, arr + (size * j), size, options) == HSORT_GT)
-				min = arr + (size * j);
+	end = arr + (len*size);
+	for (current = arr; current < end-size; current += size) {
+		selection = current;
+		for (test = current+size; test < end; test += size) {
+			if (cb(selection, test, size, options) == HSORT_GT)
+				selection = test;
 		}
-		if (min != arr + (size * i))
-			hsort_swap(arr + (size * i), min, size);
+		if (selection != current)
+			hsort_swap(current, selection, size);
 	}
 
 	return HSORT_RET_SUCCESS;

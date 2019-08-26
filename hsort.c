@@ -2,25 +2,40 @@
 
 
 /* --- HELPER FUNCTIONS --- */
+static void hsort_swap(void *a, void *b, size_t size)
+{
+	u_int64_t tmp;
+
+	switch (size) {
+		case 1:
+			tmp            = *(u_int8_t *)b;
+			*(u_int8_t *)b = *(u_int8_t *)a;
+			*(u_int8_t *)a = tmp;
+			break;
+		case 2:
+			tmp             = *(u_int16_t *)b;
+			*(u_int16_t *)b = *(u_int16_t *)a;
+			*(u_int16_t *)a = tmp;
+			break;
+		case 4:
+			tmp             = *(u_int32_t *)b;
+			*(u_int32_t *)b = *(u_int32_t *)a;
+			*(u_int32_t *)a = tmp;
+			break;
+		case 8:
+			tmp             = *(u_int64_t *)b;
+			*(u_int64_t *)b = *(u_int64_t *)a;
+			*(u_int64_t *)a = tmp;
+			break;
+	}
+}
+
 static void hsort_insert(void *left, void *right, size_t size)
 {
 	u_int64_t     tmp = 0;
 
 	/* Store value that we are moving down. */
-	switch (size) {
-		case 1:
-			tmp = *(u_int8_t *)right;
-			break;
-		case 2:
-			tmp = *(u_int16_t *)right;
-			break;
-		case 4:
-			tmp = *(u_int32_t *)right;
-			break;
-		case 8:
-			tmp = *(u_int64_t *)right;
-			break;
-	}
+	hsort_swap(right, &tmp, size);
 
 	/* Shift the value at each index one to the right. */
 	while (right > left) {
@@ -42,20 +57,7 @@ static void hsort_insert(void *left, void *right, size_t size)
 	}
 
 	/* Insert value in sorted place. */
-	switch (size) {
-		case 1:
-			*(u_int8_t *)right = tmp;
-			break;
-		case 2:
-			*(u_int16_t *)right = tmp;
-			break;
-		case 4:
-			*(u_int32_t *)right = tmp;
-			break;
-		case 8:
-			*(u_int64_t *)right = tmp;
-			break;
-	}
+	hsort_swap(right, &tmp, size);
 }
 
 

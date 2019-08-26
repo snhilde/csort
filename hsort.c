@@ -1,6 +1,64 @@
 #include "hsort.h"
 
 
+/* --- HELPER FUNCTIONS --- */
+static void hsort_insert(void *left, void *right, size_t size)
+{
+	u_int64_t     tmp = 0;
+
+	/* Store value that we are moving down. */
+	switch (size) {
+		case 1:
+			tmp = *(u_int8_t *)right;
+			break;
+		case 2:
+			tmp = *(u_int16_t *)right;
+			break;
+		case 4:
+			tmp = *(u_int32_t *)right;
+			break;
+		case 8:
+			tmp = *(u_int64_t *)right;
+			break;
+	}
+
+	/* Shift the value at each index one to the right. */
+	while (right > left) {
+		switch (size) {
+			case 1:
+				*(u_int8_t *)right = *((u_int8_t *)(right) - 1);
+				break;
+			case 2:
+				*(u_int16_t *)right = *((u_int16_t *)(right) - 1);
+				break;
+			case 4:
+				*(u_int32_t *)right = *((u_int32_t *)(right) - 1);
+				break;
+			case 8:
+				*(u_int64_t *)right = *((u_int64_t *)(right) - 1);
+				break;
+		}
+		right -= size;
+	}
+
+	/* Insert value in sorted place. */
+	switch (size) {
+		case 1:
+			*(u_int8_t *)right = tmp;
+			break;
+		case 2:
+			*(u_int16_t *)right = tmp;
+			break;
+		case 4:
+			*(u_int32_t *)right = tmp;
+			break;
+		case 8:
+			*(u_int64_t *)right = tmp;
+			break;
+	}
+}
+
+
 /* --- CALLBACKS --- */
 static hsort_equality_t hsort_int_cb(void *left, void *right, hsort_options_t options)
 {

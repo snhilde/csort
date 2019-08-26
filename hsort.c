@@ -45,6 +45,21 @@ static hsort_equality_t hsort_str_cb(void *left, void *right, hsort_options_t op
 /* --- SORTING ALGORITHMS --- */
 static hsort_return_t hsort_insertion(void *arr, size_t len, size_t size, hsort_equality_cb cb, hsort_options_t options)
 {
+	unsigned int i;
+	unsigned int j;
+	void *left;
+	void *right;
+
+	for (i = 0; i+1 < len; i++) {
+		right = arr + (i+1)*size;
+		for (j = 0; j <= i; j++) {
+			left = arr + j*size;
+			if (cb(left, right, options) != HSORT_LT) {
+				hsort_insert(left, right, size);
+				break;
+			}
+		}
+	}
 
 	return HSORT_RET_SUCCESS;
 }

@@ -29,10 +29,10 @@ typedef enum hsort_equality {
 } hsort_equality_t;
 
 
-typedef hsort_equality_t (*hsort_equality_cb)(void *left, void *right, hsort_options_t options);
+typedef hsort_equality_t (*hsort_equality_cb)(void *left, void *right, size_t size, hsort_options_t options);
 
-hsort_return_t hsort_int(int64_t *arr, size_t len, hsort_options_t options);
-hsort_return_t hsort_uint(u_int64_t *arr, size_t len, hsort_options_t options);
+hsort_return_t hsort_int(void *arr, size_t len, size_t size, hsort_options_t options);
+hsort_return_t hsort_uint(void *arr, size_t len, size_t size, hsort_options_t options);
 hsort_return_t hsort_str(char *str, hsort_options_t options);
 hsort_return_t hsort_custom(void *arr, size_t len, size_t size, hsort_equality_cb cb, hsort_options_t options);
 

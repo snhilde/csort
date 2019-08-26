@@ -148,7 +148,7 @@ static hsort_return_t hsort_insertion(void *arr, size_t len, size_t size, hsort_
 	void *test;
 
 	end = arr + (len*size);
-	for (selection = arr+size; selection <= end; selection += size) {
+	for (selection = arr+size; selection < end; selection += size) {
 		for (test = arr; test < selection; test += size) {
 			if (cb(selection, test, size, options) != HSORT_GT) {
 				hsort_insert(test, selection, size);

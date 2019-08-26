@@ -51,9 +51,9 @@ int main(int argc, char *argv[])
 	printf("\n");
 
 	printf("Characters:\n");
-	print_arr(str, sizeof(str)/sizeof(*str), CHAR);
+	printf("%s\n", str);
 	hsort_str(str, HSORT_INSERTION_SORT|HSORT_ORDER_ASC);
-	print_arr(str, sizeof(str)/sizeof(*str), CHAR);
+	printf("%s\n", str);
 
 	return EXIT_SUCCESS;
 }

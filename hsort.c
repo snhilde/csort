@@ -164,6 +164,19 @@ static hsort_return_t hsort_insertion(void *arr, size_t len, size_t size, hsort_
 
 static hsort_return_t hsort_selection(void *arr, size_t len, size_t size, hsort_equality_cb cb, hsort_options_t options)
 {
+	unsigned int  i;
+	unsigned int  j;
+	void         *min;
+
+	for (i = 0; i < len-1; i++) {
+		min = arr + (size * i);
+		for (j = i+1; j < len; j++) {
+			if (cb(min, arr + (size * j), size, options) == HSORT_GT)
+				min = arr + (size * j);
+		}
+		if (min != arr + (size * i))
+			hsort_swap(arr + (size * i), min, size);
+	}
 
 	return HSORT_RET_SUCCESS;
 }

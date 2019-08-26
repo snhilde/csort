@@ -40,13 +40,13 @@ int main(int argc, char *argv[])
 
 	printf("Integers:\n");
 	print_arr(nums, sizeof(nums)/sizeof(*nums), INT);
-	hsort_int(nums, sizeof(nums)/sizeof(*nums), HSORT_INSERTION_SORT|HSORT_ORDER_ASC);
+	hsort_int(nums, sizeof(nums)/sizeof(*nums), sizeof(*nums), HSORT_INSERTION_SORT|HSORT_ORDER_ASC);
 	print_arr(nums, sizeof(nums)/sizeof(*nums), INT);
 	printf("\n");
 
 	printf("Unsigned integers:\n");
 	print_arr(u_nums, sizeof(u_nums)/sizeof(*u_nums), UINT);
-	hsort_uint(u_nums, sizeof(u_nums)/sizeof(*u_nums), HSORT_INSERTION_SORT|HSORT_ORDER_ASC);
+	hsort_uint(u_nums, sizeof(u_nums)/sizeof(*u_nums), sizeof(*u_nums), HSORT_INSERTION_SORT|HSORT_ORDER_ASC);
 	print_arr(u_nums, sizeof(u_nums)/sizeof(*u_nums), UINT);
 	printf("\n");
 

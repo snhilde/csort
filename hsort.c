@@ -60,10 +60,29 @@ static void hsort_insert(void *left, void *right, size_t size)
 
 
 /* --- CALLBACKS --- */
-static hsort_equality_t hsort_int_cb(void *left, void *right, hsort_options_t options)
+static hsort_equality_t hsort_int_cb(void *left, void *right, size_t size, hsort_options_t options)
 {
-	int64_t a = *(int64_t *)left;
-	int64_t b = *(int64_t *)right;
+	int64_t a;
+	int64_t b;
+
+	switch (size) {
+		case 1:
+			a = *(int8_t *)left;
+			b = *(int8_t *)right;
+			break;
+		case 2:
+			a = *(int16_t *)left;
+			b = *(int16_t *)right;
+			break;
+		case 4:
+			a = *(int32_t *)left;
+			b = *(int32_t *)right;
+			break;
+		case 8:
+			a = *(int64_t *)left;
+			b = *(int64_t *)right;
+			break;
+	}
 
 	if (a < b)
 		return HSORT_LT;
@@ -73,10 +92,29 @@ static hsort_equality_t hsort_int_cb(void *left, void *right, hsort_options_t op
 	return HSORT_EQ;
 }
 
-static hsort_equality_t hsort_uint_cb(void *left, void *right, hsort_options_t options)
+static hsort_equality_t hsort_uint_cb(void *left, void *right, size_t size, hsort_options_t options)
 {
-	u_int64_t a = *(u_int64_t *)left;
-	u_int64_t b = *(u_int64_t *)right;
+	u_int64_t a;
+	u_int64_t b;
+
+	switch (size) {
+		case 1:
+			a = *(u_int8_t *)left;
+			b = *(u_int8_t *)right;
+			break;
+		case 2:
+			a = *(u_int16_t *)left;
+			b = *(u_int16_t *)right;
+			break;
+		case 4:
+			a = *(u_int32_t *)left;
+			b = *(u_int32_t *)right;
+			break;
+		case 8:
+			a = *(u_int64_t *)left;
+			b = *(u_int64_t *)right;
+			break;
+	}
 
 	if (a < b)
 		return HSORT_LT;
@@ -86,7 +124,7 @@ static hsort_equality_t hsort_uint_cb(void *left, void *right, hsort_options_t o
 	return HSORT_EQ;
 }
 
-static hsort_equality_t hsort_str_cb(void *left, void *right, hsort_options_t options)
+static hsort_equality_t hsort_str_cb(void *left, void *right, size_t size, hsort_options_t options)
 {
 	char a = *(char *)left;
 	char b = *(char *)right;
@@ -112,7 +150,7 @@ static hsort_return_t hsort_insertion(void *arr, size_t len, size_t size, hsort_
 		right = arr + (i+1)*size;
 		for (j = 0; j <= i; j++) {
 			left = arr + j*size;
-			if (cb(left, right, options) != HSORT_LT) {
+			if (cb(left, right, size, options) != HSORT_LT) {
 				hsort_insert(left, right, size);
 				break;
 			}
@@ -160,14 +198,14 @@ hsort_return_t hsort_custom(void *arr, size_t len, size_t size, hsort_equality_c
 
 
 /* --- API WRAPPERS --- */
-hsort_return_t hsort_int(int64_t *arr, size_t len, hsort_options_t options)
+hsort_return_t hsort_int(void *arr, size_t len, size_t size, hsort_options_t options)
 {
-	return hsort_custom(arr, len, sizeof(*arr), hsort_int_cb, options);
+	return hsort_custom(arr, len, size, hsort_int_cb, options);
 }
 
-hsort_return_t hsort_uint(u_int64_t *arr, size_t len, hsort_options_t options)
+hsort_return_t hsort_uint(void *arr, size_t len, size_t size, hsort_options_t options)
 {
-	return hsort_custom(arr, len, sizeof(*arr), hsort_uint_cb, options);
+	return hsort_custom(arr, len, size, hsort_uint_cb, options);
 }
 
 hsort_return_t hsort_str(char *str, hsort_options_t options)

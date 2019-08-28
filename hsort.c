@@ -234,8 +234,13 @@ static hsort_return_t hsort_merge(void *arr, size_t len, size_t size, hsort_equa
 
 	do {
 		if (len > 1) {
-			node  = hsort_new_node(arr, len);
-			stack = hsort_push(stack, node);
+			node   = hsort_new_node(arr, len);
+			stack  = hsort_push(stack, node);
+			len   /= 2;
+
+		} else if (len == 1) {
+			node = hsort_pop(&stack);
+
 		}
 	} while (stack != NULL);
 

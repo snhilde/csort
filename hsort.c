@@ -215,8 +215,7 @@ static void hsort_push(struct hsort_merge_node **top_node, void *array, size_t l
 	node->next     = *top_node;
 	node->array    = array;
 	node->len      = len;
-	node->on_left  = false;
-	node->on_right = false;
+	node->step     = HSORT_MERGE_NEW;
 
 	*top_node = node;
 }

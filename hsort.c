@@ -1,6 +1,16 @@
 #include "hsort.h"
 
 
+/* --- HELPER TYPES --- */
+enum hsort_merge_step {
+	HSORT_MERGE_ON_LEFT,
+	HSORT_MERGE_LEFT_DONE,
+	HSORT_MERGE_ON_RIGHT,
+	HSORT_MERGE_RIGHT_DONE,
+	HSORT_MERGE_READY_TO_MERGE,
+	HSORT_MERGE_MERGE_DONE,
+};
+
 struct hsort_merge_node {
 	struct hsort_merge_node *next;
 	void                    *array;

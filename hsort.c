@@ -3,6 +3,7 @@
 
 /* --- HELPER TYPES --- */
 enum hsort_merge_step {
+	HSORT_MERGE_NEW,
 	HSORT_MERGE_ON_LEFT,
 	HSORT_MERGE_LEFT_DONE,
 	HSORT_MERGE_ON_RIGHT,

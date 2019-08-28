@@ -297,6 +297,7 @@ static hsort_return_t hsort_merge(void *arr, size_t len, size_t size, hsort_equa
 		}
 	}
 
+	free(tmp_arr);
 	return HSORT_RET_SUCCESS;
 }
 

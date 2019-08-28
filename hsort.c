@@ -68,41 +68,27 @@ static void hsort_insert(void *left, void *right, size_t size)
 	hsort_swap(right, &tmp, size);
 }
 
-static struct hsort_merge_node *hsort_push(struct hsort_merge_node *stack, struct hsort_merge_node *node)
-{
-	node->next = stack;
-
-	return node;
-}
-
-static struct hsort_merge_node *hsort_pop(struct hsort_merge_node **stack)
-{
-	struct hsort_merge_node *node;
-
-	node       = *stack;
-	node->next = NULL;
-
-	*stack     = (*stack)->next;
-
-	return node;
-}
-
-static struct hsort_merge_node *hsort_new_node(void *array, size_t len)
+static void hsort_push(struct hsort_merge_node **top_node, void *array, size_t len)
 {
 	struct hsort_merge_node *node;
 
 	node = malloc(sizeof(*node));
 
-	node->next  = NULL;
+	node->next  = *top_node;
 	node->array = array;
 	node->len   = len;
 	node->merge = false;
 
-	return node;
+	*top_node = node;
 }
 
-static void hsort_destroy_node(struct hsort_merge_node *node)
+static void hsort_pop(struct hsort_merge_node **top_node)
 {
+	struct hsort_merge_node *node;
+
+	node      = *top_node;
+	*top_node = (*top_node)->next;
+
 	free(node);
 }
 
@@ -234,7 +220,6 @@ static hsort_return_t hsort_merge(void *arr, size_t len, size_t size, hsort_equa
 	do {
 	} while (top_node != NULL);
 
-	hsort_destroy_node(top_node);
 	return HSORT_RET_SUCCESS;
 }
 

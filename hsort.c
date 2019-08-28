@@ -284,14 +284,14 @@ static hsort_return_t hsort_merge(void *arr, size_t len, size_t size, hsort_equa
 			/* Left half is done. Move to right half, using the smaller portion. */
 			top_node->on_right = true;
 			tmp_len = top_node->len / 2;
-			if (tmp_len != 1)
+			if (tmp_len > 1)
 				hsort_push(&top_node, top_node->array + ((top_node->len + 1)/2) * size, tmp_len);
 
 		} else {
 			/* Start working on the left half, using the larger portion. */
 			top_node->on_left = true;
 			tmp_len = (top_node->len + 1) / 2;
-			if (tmp_len != 1)
+			if (tmp_len > 1)
 				hsort_push(&top_node, top_node->array, tmp_len);
 		}
 	}

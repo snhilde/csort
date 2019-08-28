@@ -229,7 +229,11 @@ static hsort_return_t hsort_selection(void *arr, size_t len, size_t size, hsort_
 
 static hsort_return_t hsort_merge(void *arr, size_t len, size_t size, hsort_equality_cb cb, hsort_options_t options)
 {
+	struct hsort_merge_node *stack;
 
+	stack = hsort_new_node(arr, len);
+
+	hsort_destroy_node(stack);
 	return HSORT_RET_SUCCESS;
 }
 

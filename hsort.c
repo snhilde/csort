@@ -218,6 +218,35 @@ static hsort_return_t hsort_selection(void *arr, size_t len, size_t size, hsort_
 static hsort_return_t hsort_merge(void *arr, size_t len, size_t size, hsort_equality_cb cb, hsort_options_t options)
 {
 	struct hsort_merge_node *top_node = NULL;
+	void                    *tmp_arr;
+
+	tmp_arr = calloc(len, size);
+
+	hsort_push(&top_node, arr, len);
+
+	while (top_node != NULL) {
+		if (top_node->len == 1) {
+			/* Discard leaf node. */
+			hsort_pop(&top_node);
+
+		} else {
+			if (top_node->on_right == true) {
+				/* Both halves are sorted. Merge them together. */
+				merge_stub(top_node, tmp_arr);
+				hsort_pop(&top_node);
+
+			} else if (top_node->on_left == true) {
+				/* Left half is done. Move to right half, using the smaller portion. */
+				top_node->on_right = true;
+				hsort_push(&top_node, top_node->array + (top_node->len + 1)/2, (top_node->len)/2);
+
+			} else {
+				/* Start working on the left half, using the larger portion. */
+				top_node->on_left = true;
+				hsort_push(&top_node, top_node->array, (top_node->len + 1)/2);
+			}
+		}
+	}
 
 	return HSORT_RET_SUCCESS;
 }

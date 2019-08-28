@@ -69,6 +69,10 @@ static void hsort_insert(void *left, void *right, size_t size)
 	hsort_swap(right, &tmp, size);
 }
 
+static void hsort_merge_subarrays(struct hsort_merge_node *top_node, void *tmp_array, size_t size)
+{
+}
+
 static void hsort_push(struct hsort_merge_node **top_node, void *array, size_t len)
 {
 	struct hsort_merge_node *node;
@@ -232,7 +236,7 @@ static hsort_return_t hsort_merge(void *arr, size_t len, size_t size, hsort_equa
 		} else {
 			if (top_node->on_right == true) {
 				/* Both halves are sorted. Merge them together. */
-				merge_stub(top_node, tmp_arr);
+				hsort_merge_subarrays(top_node, tmp_arr, size);
 				hsort_pop(&top_node);
 
 			} else if (top_node->on_left == true) {

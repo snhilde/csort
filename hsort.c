@@ -8,8 +8,6 @@ enum hsort_merge_step {
 	HSORT_MERGE_LEFT_DONE,
 	HSORT_MERGE_ON_RIGHT,
 	HSORT_MERGE_RIGHT_DONE,
-	HSORT_MERGE_READY_TO_MERGE,
-	HSORT_MERGE_MERGE_DONE,
 };
 
 struct hsort_merge_node {
@@ -293,29 +291,19 @@ static hsort_return_t hsort_merge(void *arr, size_t len, size_t size, hsort_equa
 			if (top_node == NULL)
 				break;
 
-			/* Mark next node as ready to process. */
-			if (top_node->step == HSORT_MERGE_ON_LEFT)
-				top_node->step = HSORT_MERGE_LEFT_DONE;
-			else
-				top_node->step = HSORT_MERGE_RIGHT_DONE;
-
 		} else if (top_node->step == HSORT_MERGE_LEFT_DONE) {
 			/* Left half is done. Move to right half, using the smaller portion. */
-			top_node->step = HSORT_MERGE_ON_RIGHT;
+			top_node->step = HSORT_MERGE_RIGHT_DONE;
 			tmp_len        = top_node->len / 2;
 			if (tmp_len > 1)
 				hsort_push(&top_node, top_node->array + ((top_node->len + 1)/2) * size, tmp_len);
-			else
-				top_node->step = HSORT_MERGE_RIGHT_DONE;
 
 		} else {
 			/* Start working on the left half, using the larger portion. */
-			top_node->step = HSORT_MERGE_ON_LEFT;
+			top_node->step = HSORT_MERGE_LEFT_DONE;
 			tmp_len        = (top_node->len + 1) / 2;
 			if (tmp_len > 1)
 				hsort_push(&top_node, top_node->array, tmp_len);
-			else
-				top_node->step = HSORT_MERGE_LEFT_DONE;
 		}
 	}
 

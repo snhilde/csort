@@ -74,6 +74,7 @@ static struct hsort_merge_node *hsort_new_node(void *array, size_t len)
 
 	node = malloc(sizeof(*node));
 
+	node->next  = NULL;
 	node->array = array;
 	node->len   = len;
 	node->merge = false;

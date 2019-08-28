@@ -150,6 +150,51 @@ static void hsort_insert(void *left, void *right, size_t size)
 
 static void hsort_merge_subarrays(struct hsort_merge_node *top_node, void *tmp_array, size_t size, hsort_equality_cb cb)
 {
+	void   *head;
+	size_t  left_len;
+	size_t  right_len;
+	void   *left_array;
+	void   *right_array;
+	size_t  i;
+
+	/* Keep a reference to the beginning of the temporary array. */
+	head = tmp_array;
+
+	left_len  = (top_node->len + 1) / 2; /* bigger half */
+	right_len = (top_node->len) / 2;     /* smaller half */
+
+	left_array  = top_node->array;
+	right_array = top_node->array + (left_len * size);
+
+	for (i = 0; i < top_node->len; i++) {
+		if (left_len == 0) {
+			/* Left side is done. Move over the right value. */
+			hsort_swap(right_array, tmp_array, size);
+			right_array += size;
+			right_len--;
+
+		} else if (right_len == 0) {
+			/* Right side is done. Move over the left value. */
+			hsort_swap(left_array, tmp_array, size);
+			left_array += size;
+			left_len--;
+
+		} else if (cb(left_array, right_array, size, 0) != HSORT_GT) {
+			/* Left value is less than or equal to right value. Move it to the array. */
+			hsort_swap(left_array, tmp_array, size);
+			left_array += size;
+			left_len--;
+
+		} else {
+			/* Right value is less than left value. Move it to the array. */
+			hsort_swap(right_array, tmp_array, size);
+			right_array += size;
+			right_len--;
+		}
+
+		tmp_array += size;
+	}
+	memcpy(top_node->array, head, top_node->len * size);
 }
 
 static void hsort_push(struct hsort_merge_node **top_node, void *array, size_t len)

@@ -5,7 +5,8 @@ struct hsort_merge_node {
 	struct hsort_merge_node *next;
 	void                    *array;
 	size_t                   len;
-	bool                     merge;
+	bool                     on_left;
+	bool                     on_right;
 };
 
 
@@ -74,10 +75,11 @@ static void hsort_push(struct hsort_merge_node **top_node, void *array, size_t l
 
 	node = malloc(sizeof(*node));
 
-	node->next  = *top_node;
-	node->array = array;
-	node->len   = len;
-	node->merge = false;
+	node->next     = *top_node;
+	node->array    = array;
+	node->len      = len;
+	node->on_left  = false;
+	node->on_right = false;
 
 	*top_node = node;
 }
@@ -216,9 +218,6 @@ static hsort_return_t hsort_selection(void *arr, size_t len, size_t size, hsort_
 static hsort_return_t hsort_merge(void *arr, size_t len, size_t size, hsort_equality_cb cb, hsort_options_t options)
 {
 	struct hsort_merge_node *top_node = NULL;
-
-	do {
-	} while (top_node != NULL);
 
 	return HSORT_RET_SUCCESS;
 }

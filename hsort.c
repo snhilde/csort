@@ -101,6 +101,11 @@ static struct hsort_merge_node *hsort_new_node(void *array, size_t len)
 	return node;
 }
 
+static void hsort_destroy_node(struct hsort_merge_node *node)
+{
+	free(node);
+}
+
 
 /* --- CALLBACKS --- */
 static hsort_equality_t hsort_int_cb(void *left, void *right, size_t size, hsort_options_t options)

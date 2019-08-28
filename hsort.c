@@ -67,6 +67,19 @@ static void hsort_insert(void *left, void *right, size_t size)
 	hsort_swap(right, &tmp, size);
 }
 
+static struct hsort_merge_node hsort_new_node(void *array, size_t len)
+{
+	struct hsort_merge_node *node;
+
+	node = malloc(sizeof(*node));
+
+	node->array = array;
+	node->len   = len;
+	node->merge = false;
+
+	return node;
+}
+
 
 /* --- CALLBACKS --- */
 static hsort_equality_t hsort_int_cb(void *left, void *right, size_t size, hsort_options_t options)

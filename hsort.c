@@ -1,6 +1,13 @@
 #include "hsort.h"
 
 
+struct {
+	void   *array;
+	size_t  len;
+	bool    merge;
+} hsort_merge_node;
+
+
 /* --- HELPER FUNCTIONS --- */
 static void hsort_swap(void *a, void *b, size_t size)
 {

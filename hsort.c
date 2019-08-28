@@ -15,8 +15,7 @@ struct hsort_merge_node {
 	struct hsort_merge_node *next;
 	void                    *array;
 	size_t                   len;
-	bool                     on_left;
-	bool                     on_right;
+	enum hsort_merge_step    step;
 };
 
 

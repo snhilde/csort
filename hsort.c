@@ -10,6 +10,85 @@ struct hsort_merge_node {
 };
 
 
+/* --- CALLBACKS --- */
+static hsort_equality_t hsort_int_cb(void *left, void *right, size_t size, hsort_options_t options)
+{
+	int64_t a;
+	int64_t b;
+
+	switch (size) {
+		case 1:
+			a = *(int8_t *)left;
+			b = *(int8_t *)right;
+			break;
+		case 2:
+			a = *(int16_t *)left;
+			b = *(int16_t *)right;
+			break;
+		case 4:
+			a = *(int32_t *)left;
+			b = *(int32_t *)right;
+			break;
+		case 8:
+			a = *(int64_t *)left;
+			b = *(int64_t *)right;
+			break;
+	}
+
+	if (a < b)
+		return HSORT_LT;
+	else if (a > b)
+		return HSORT_GT;
+
+	return HSORT_EQ;
+}
+
+static hsort_equality_t hsort_uint_cb(void *left, void *right, size_t size, hsort_options_t options)
+{
+	u_int64_t a;
+	u_int64_t b;
+
+	switch (size) {
+		case 1:
+			a = *(u_int8_t *)left;
+			b = *(u_int8_t *)right;
+			break;
+		case 2:
+			a = *(u_int16_t *)left;
+			b = *(u_int16_t *)right;
+			break;
+		case 4:
+			a = *(u_int32_t *)left;
+			b = *(u_int32_t *)right;
+			break;
+		case 8:
+			a = *(u_int64_t *)left;
+			b = *(u_int64_t *)right;
+			break;
+	}
+
+	if (a < b)
+		return HSORT_LT;
+	else if (a > b)
+		return HSORT_GT;
+
+	return HSORT_EQ;
+}
+
+static hsort_equality_t hsort_str_cb(void *left, void *right, size_t size, hsort_options_t options)
+{
+	char a = *(char *)left;
+	char b = *(char *)right;
+
+	if (a < b)
+		return HSORT_LT;
+	else if (a > b)
+		return HSORT_GT;
+
+	return HSORT_EQ;
+}
+
+
 /* --- HELPER FUNCTIONS --- */
 static void hsort_swap(void *a, void *b, size_t size)
 {
@@ -96,85 +175,6 @@ static void hsort_pop(struct hsort_merge_node **top_node)
 	*top_node = (*top_node)->next;
 
 	free(node);
-}
-
-
-/* --- CALLBACKS --- */
-static hsort_equality_t hsort_int_cb(void *left, void *right, size_t size, hsort_options_t options)
-{
-	int64_t a;
-	int64_t b;
-
-	switch (size) {
-		case 1:
-			a = *(int8_t *)left;
-			b = *(int8_t *)right;
-			break;
-		case 2:
-			a = *(int16_t *)left;
-			b = *(int16_t *)right;
-			break;
-		case 4:
-			a = *(int32_t *)left;
-			b = *(int32_t *)right;
-			break;
-		case 8:
-			a = *(int64_t *)left;
-			b = *(int64_t *)right;
-			break;
-	}
-
-	if (a < b)
-		return HSORT_LT;
-	else if (a > b)
-		return HSORT_GT;
-
-	return HSORT_EQ;
-}
-
-static hsort_equality_t hsort_uint_cb(void *left, void *right, size_t size, hsort_options_t options)
-{
-	u_int64_t a;
-	u_int64_t b;
-
-	switch (size) {
-		case 1:
-			a = *(u_int8_t *)left;
-			b = *(u_int8_t *)right;
-			break;
-		case 2:
-			a = *(u_int16_t *)left;
-			b = *(u_int16_t *)right;
-			break;
-		case 4:
-			a = *(u_int32_t *)left;
-			b = *(u_int32_t *)right;
-			break;
-		case 8:
-			a = *(u_int64_t *)left;
-			b = *(u_int64_t *)right;
-			break;
-	}
-
-	if (a < b)
-		return HSORT_LT;
-	else if (a > b)
-		return HSORT_GT;
-
-	return HSORT_EQ;
-}
-
-static hsort_equality_t hsort_str_cb(void *left, void *right, size_t size, hsort_options_t options)
-{
-	char a = *(char *)left;
-	char b = *(char *)right;
-
-	if (a < b)
-		return HSORT_LT;
-	else if (a > b)
-		return HSORT_GT;
-
-	return HSORT_EQ;
 }
 
 

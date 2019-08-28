@@ -2,9 +2,10 @@
 
 
 struct {
-	void   *array;
-	size_t  len;
-	bool    merge;
+	struct hsort_merge_node *next;
+	void                    *array;
+	size_t                   len;
+	bool                     merge;
 } hsort_merge_node;
 
 

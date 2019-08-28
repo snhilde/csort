@@ -229,22 +229,12 @@ static hsort_return_t hsort_selection(void *arr, size_t len, size_t size, hsort_
 
 static hsort_return_t hsort_merge(void *arr, size_t len, size_t size, hsort_equality_cb cb, hsort_options_t options)
 {
-	struct hsort_merge_node *stack = NULL;
-	struct hsort_merge_node *node  = NULL;
+	struct hsort_merge_node *top_node = NULL;
 
 	do {
-		if (len > 1) {
-			node   = hsort_new_node(arr, len);
-			stack  = hsort_push(stack, node);
-			len   /= 2;
+	} while (top_node != NULL);
 
-		} else if (len == 1) {
-			node = hsort_pop(&stack);
-
-		}
-	} while (stack != NULL);
-
-	hsort_destroy_node(stack);
+	hsort_destroy_node(top_node);
 	return HSORT_RET_SUCCESS;
 }
 

@@ -1,12 +1,12 @@
 #include "hsort.h"
 
 
-struct {
+struct hsort_merge_node {
 	struct hsort_merge_node *next;
 	void                    *array;
 	size_t                   len;
 	bool                     merge;
-} hsort_merge_node;
+};
 
 
 /* --- HELPER FUNCTIONS --- */

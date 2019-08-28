@@ -75,6 +75,18 @@ static struct hsort_merge_node *hsort_push(struct hsort_merge_node *stack, struc
 	return node;
 }
 
+static struct hsort_merge_node *hsort_pop(struct hsort_merge_node **stack)
+{
+	struct hsort_merge_node *node;
+
+	node       = *stack;
+	node->next = NULL;
+
+	*stack     = (*stack)->next;
+
+	return node;
+}
+
 static struct hsort_merge_node *hsort_new_node(void *array, size_t len)
 {
 	struct hsort_merge_node *node;

@@ -24,9 +24,9 @@ typedef enum hsort_return {
 } hsort_return_t;
 
 typedef enum hsort_equality {
-	HSORT_GT = 1, /* Greater than */
-	HSORT_LT,     /* Less than */
-	HSORT_EQ      /* Equal to */
+	HSORT_LT = -1, /* Less than */
+	HSORT_EQ = 0,  /* Equal to */
+	HSORT_GT = 1   /* Greater than */
 } hsort_equality_t;
 
 

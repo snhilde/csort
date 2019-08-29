@@ -42,9 +42,9 @@ static hsort_equality_t hsort_int_cb(void *left, void *right, size_t size, hsort
 	}
 
 	if (a < b)
-		return (options & HSORT_ORDER_ASC) ? HSORT_LT : HSORT_GT;
+		return HSORT_LT;
 	else if (a > b)
-		return (options & HSORT_ORDER_ASC) ? HSORT_GT : HSORT_LT;
+		return HSORT_GT;
 
 	return HSORT_EQ;
 }
@@ -74,9 +74,9 @@ static hsort_equality_t hsort_uint_cb(void *left, void *right, size_t size, hsor
 	}
 
 	if (a < b)
-		return (options & HSORT_ORDER_ASC) ? HSORT_LT : HSORT_GT;
+		return HSORT_LT;
 	else if (a > b)
-		return (options & HSORT_ORDER_ASC) ? HSORT_GT : HSORT_LT;
+		return HSORT_GT;
 
 	return HSORT_EQ;
 }
@@ -87,9 +87,9 @@ static hsort_equality_t hsort_str_cb(void *left, void *right, size_t size, hsort
 	char b = *(char *)right;
 
 	if (a < b)
-		return (options & HSORT_ORDER_ASC) ? HSORT_LT : HSORT_GT;
+		return HSORT_LT;
 	else if (a > b)
-		return (options & HSORT_ORDER_ASC) ? HSORT_GT : HSORT_LT;
+		return HSORT_GT;
 
 	return HSORT_EQ;
 }

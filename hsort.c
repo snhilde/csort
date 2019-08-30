@@ -227,6 +227,13 @@ static void hsort_pop(struct hsort_merge_node **top_node)
 	free(node);
 }
 
+static u_int64_t hsort_random_num(size_t size, bool is_signed)
+{
+	u_int64_t num = 0;
+
+	return num;
+}
+
 
 /* --- SORTING ALGORITHMS --- */
 static hsort_return_t hsort_insertion(void *arr, size_t len, size_t size, hsort_equality_cb cb, hsort_options_t options)

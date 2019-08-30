@@ -348,7 +348,7 @@ hsort_return_t hsort_str(char *str, hsort_options_t options)
 	return hsort_custom(str, strlen(str), sizeof(*str), hsort_str_cb, options);
 }
 
-hsort_return_t run_test(size_t len, size_t size, bool is_signed, hsort_options_t options)
+hsort_return_t hsort_test(size_t len, size_t size, bool is_signed, hsort_options_t options)
 {
 	void         *internal_array; /* Array that we will sort for the test */
 	void         *qsort_array;    /* Array that qsort will sort for a known-good check. */

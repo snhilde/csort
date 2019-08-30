@@ -229,6 +229,18 @@ static void hsort_pop(struct hsort_merge_node **top_node)
 
 static u_int64_t hsort_random_num(size_t size, bool is_signed)
 {
+	/* We're going to produce a pseudo-pseudo-random number here. The first pseudo is because
+ 	 * the generator function we're going to use (lrand48) generates pseudo-random numbers.
+	 * The second pseudo is because lrand48(), which produces values of uniform distribution,
+	 * coupled with basic statistics will yield more values with higher digit lengths than lower
+	 * digit lengths. This makes sense, because there are more numbers with a length of 8 digits
+	 * than there are numbers with a length 2 digits. To test the sorting function's ability to
+	 * sort values of all possible lengths, we want uniformity on value as well as digit length.
+	 * We're going to follow three steps to produce these pseudo-pseudo-random values:
+	 * 1. Calculate a random digit length between 1 and the maximum length we can have.
+	 * 2. For each place, calculate a random digit between 0 and 9.
+	 * 3. Insert that digit in the appropriate place in the number.
+	 */
 	u_int64_t num = 0;
 
 	return num;

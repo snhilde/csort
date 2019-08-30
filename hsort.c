@@ -240,6 +240,8 @@ static u_int64_t hsort_random_num(size_t size, bool is_signed)
 	 * 1. Calculate a random digit length between 1 and the maximum length we can have.
 	 * 2. For each place, calculate a random digit between 0 and 9.
 	 * 3. Insert that digit in the appropriate place in the number.
+	 *
+	 * Note: We don't care about overflow for our purposes.
 	 */
 	u_int64_t num = 0;
 

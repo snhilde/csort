@@ -116,6 +116,8 @@ static void print_array(void *arr, size_t len, size_t size, bool is_signed)
 
 int main(int argc, char *argv[])
 {
+	int   i;
+	void *array;
 	struct {
 		void *test;  /* Test array that will be sorted */
 		void *check; /* Known-good check array that test array will be checked against */
@@ -140,6 +142,11 @@ int main(int argc, char *argv[])
 	};
 
 	printf("Sorting signed arrays, ascending\n");
+	for (i = 0; signed_arrays[i].test != NULL; i++) {
+		array = signed_arrays[i].test;
+		hsort_int(array, sizeof(array)/sizeof(*array), sizeof(*array), HSORT_MERGE_SORT|HSORT_ORDER_ASC);
+	}
+
 	printf("Sorting unsigned array, ascendings\n");
 	printf("Sorting char array, ascendings\n");
 

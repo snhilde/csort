@@ -374,16 +374,16 @@ hsort_return_t hsort_test(size_t len, size_t size, bool is_signed, hsort_options
 	for (i = 0; i < len; i++) {
 		switch (size) {
 			case 1:
-				*(int8_t *)internal_array = hsort_random_num(size, is_signed);
+				*(u_int8_t *)internal_array = hsort_random_num(size, is_signed);
 				break;
 			case 2:
-				*(int16_t *)internal_array = hsort_random_num(size, is_signed);
+				*(u_int16_t *)internal_array = hsort_random_num(size, is_signed);
 				break;
 			case 4:
-				*(int32_t *)internal_array = hsort_random_num(size, is_signed);
+				*(u_int32_t *)internal_array = hsort_random_num(size, is_signed);
 				break;
 			case 8:
-				*(int64_t *)internal_array = hsort_random_num(size, is_signed);
+				*(u_int64_t *)internal_array = hsort_random_num(size, is_signed);
 				break;
 		}
 		internal_array += size;

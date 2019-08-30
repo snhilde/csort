@@ -270,3 +270,14 @@ int int_group_a_sorted_asc[] = {
 	1922100477,  1929636174,  2003560288,  2099388825
 };
 
+unsigned int uint_group_a[] = {
+};
+
+unsigned int uint_group_b[] = {
+};
+
+unsigned int uint_group_c[] = {
+};
+
+unsigned int uint_group_d[] = {
+};

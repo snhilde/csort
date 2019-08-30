@@ -116,47 +116,7 @@ static void print_array(void *arr, size_t len, size_t size, bool is_signed)
 
 int main(int argc, char *argv[])
 {
-	int   i;
-	void *test;
-	void *check;
-	struct {
-		void *test;  /* Test array that will be sorted */
-		void *check; /* Known-good check array that test array will be checked against */
-	} signed_arrays[] = {
-		{ int_group_a, int_group_a_sorted_asc },
-		{ int_group_b, int_group_b_sorted_asc },
-		{ int_group_c, int_group_c_sorted_asc },
-		{ int_group_d, int_group_d_sorted_asc },
-		{ NULL, NULL }
-	}, unsigned_arrays[] = {
-		{ uint_group_a, uint_group_a_sorted_asc },
-		{ uint_group_b, uint_group_b_sorted_asc },
-		{ uint_group_c, uint_group_c_sorted_asc },
-		{ uint_group_d, uint_group_d_sorted_asc },
-		{ NULL, NULL }
-	}, char_array[] = {
-		{ char_group_a, char_group_a_sorted_asc },
-		{ char_group_b, char_group_b_sorted_asc },
-		{ char_group_c, char_group_c_sorted_asc },
-		{ char_group_d, char_group_d_sorted_asc },
-		{ NULL, NULL }
-	};
-
-	printf("Sorting signed arrays, ascending\n");
-	for (i = 0; signed_arrays[i].test != NULL; i++) {
-		test  = signed_arrays[i].test;
-		check = signed_arrays[i].test;
-		hsort_int(test, sizeof(test)/sizeof(*test), sizeof(*test), HSORT_MERGE_SORT|HSORT_ORDER_ASC);
-		if (check_array(test, check,
-				sizeof(test)/sizeof(*test), sizeof(check)/sizeof(*check),
-				sizeof(*test), sizeof(*check), true))
-			printf("%d: Correct\n");
-		else
-			printf("%d: Incorrect\n");
-	}
-
-	printf("Sorting unsigned array, ascendings\n");
-	printf("Sorting char array, ascendings\n");
+	run_test(200, sizeof(int), true, HSORT_MERGE_SORT|HSORT_ORDER_ASC);
 
 	return EXIT_SUCCESS;
 }

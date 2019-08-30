@@ -5,6 +5,7 @@
 #include "hsort.h"
 
 
+/* --- SIGNED INTEGER ARRAYS --- */
 int int_group_a[] = {
 	16348,       -109,        212616,      1634,
 	1900128,     1309,        -145,        -20808,
@@ -270,6 +271,17 @@ int int_group_a_sorted_asc[] = {
 	1922100477,  1929636174,  2003560288,  2099388825
 };
 
+int int_group_b_sorted_asc[] = {
+};
+
+int int_group_c_sorted_asc[] = {
+};
+
+int int_group_d_sorted_asc[] = {
+};
+
+
+/* --- UNSIGNED INTEGER ARRAYS --- */
 unsigned int uint_group_a[] = {
 	142173754,  14,         177,        1247429574,
 	20295,      10,         162,        2127600,

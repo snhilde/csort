@@ -116,7 +116,7 @@ static void print_array(void *arr, size_t len, size_t size, bool is_signed)
 
 int main(int argc, char *argv[])
 {
-	run_test(200, sizeof(int), true, HSORT_MERGE_SORT|HSORT_ORDER_ASC);
+	hsort_test(200, sizeof(int), true, HSORT_MERGE_SORT|HSORT_ORDER_ASC);
 
 	return EXIT_SUCCESS;
 }

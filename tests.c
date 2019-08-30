@@ -139,9 +139,9 @@ int main(int argc, char *argv[])
 		{ NULL, NULL }
 	};
 
-	printf("Sorting signed arrays\n");
-	printf("Sorting unsigned arrays\n");
-	printf("Sorting char arrays\n");
+	printf("Sorting signed arrays, ascending\n");
+	printf("Sorting unsigned array, ascendings\n");
+	printf("Sorting char array, ascendings\n");
 
 	return EXIT_SUCCESS;
 }

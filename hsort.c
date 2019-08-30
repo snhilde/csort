@@ -349,3 +349,42 @@ hsort_return_t hsort_str(char *str, hsort_options_t options)
 }
 
 hsort_return_t run_test(size_t len, size_t size, bool is_signed, hsort_options_t options)
+{
+	void         *internal_array; /* Array that we will sort for the test */
+	void         *qsort_array;    /* Array that qsort will sort for a known-good check. */
+	unsigned int  i;
+
+	internal_array = malloc(len * size);
+	if (internal_array == NULL)
+		return HSORT_RET_ERROR;
+
+	qsort_array = malloc(len * size);
+	if (qsort_array == NULL) {
+		free(internal_array);
+		return HSORT_RET_ERROR;
+	}
+
+	for (i = 0; i < len; i++) {
+		switch (size) {
+			case 1:
+				*(int8_t *)internal_array = hsort_random_num(size, is_signed);
+				break;
+			case 2:
+				*(int16_t *)internal_array = hsort_random_num(size, is_signed);
+				break;
+			case 4:
+				*(int32_t *)internal_array = hsort_random_num(size, is_signed);
+				break;
+			case 8:
+				*(int64_t *)internal_array = hsort_random_num(size, is_signed);
+				break;
+		}
+		internal_array += size;
+	}
+
+	memcpy(qsort_array, internal_array, len*size);
+
+	free(internal_array);
+	free(qsort_array);
+	return HSORT_RET_SUCCESS;
+}

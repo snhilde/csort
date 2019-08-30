@@ -855,3 +855,14 @@ unsigned int uint_group_d_sorted_asc[] = {
 	3392446000, 3463215032, 3582109556, 3783338584,
 	3808520324, 3855534860, 3913978024, 3916320652
 };
+
+
+/* --- STRINGS --- */
+char *char_group_a = "";
+char *char_group_b = "";
+char *char_group_c = "";
+char *char_group_d = "";
+char *char_group_a_sorted_asc = "";
+char *char_group_b_sorted_asc = "";
+char *char_group_c_sorted_asc = "";
+char *char_group_d_sorted_asc = "";

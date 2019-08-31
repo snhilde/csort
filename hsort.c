@@ -278,6 +278,53 @@ static u_int64_t hsort_random_num(size_t size, bool is_signed)
 	return num;
 }
 
+static void *hsort_random_array(size_t len, size_t size, bool is_signed)
+{
+	void         *array;
+	void         *pos;
+	unsigned int  i;
+
+	array = malloc(len * size);
+	if (array == NULL)
+		return NULL;
+
+	pos = array;
+	for (i = 0; i < len; i++) {
+		switch (size) {
+			case 1:
+				if (is_signed)
+					*(int8_t *)pos = (int8_t)hsort_random_num(size, true);
+				else
+					*(u_int8_t *)pos = (u_int8_t)hsort_random_num(size, false);
+				break;
+
+			case 2:
+				if (is_signed)
+					*(int16_t *)pos = (int16_t)hsort_random_num(size, true);
+				else
+					*(u_int16_t *)pos = (u_int16_t)hsort_random_num(size, false);
+				break;
+
+			case 4:
+				if (is_signed)
+					*(int32_t *)pos = (int32_t)hsort_random_num(size, true);
+				else
+					*(u_int32_t *)pos = (u_int32_t)hsort_random_num(size, false);
+				break;
+
+			case 8:
+				if (is_signed)
+					*(int64_t *)pos = (int64_t)hsort_random_num(size, true);
+				else
+					*(u_int64_t *)pos = (u_int64_t)hsort_random_num(size, false);
+				break;
+		}
+		pos += size;
+	}
+
+	return array;
+}
+
 
 /* --- SORTING ALGORITHMS --- */
 static hsort_return_t hsort_insertion(void *arr, size_t len, size_t size, hsort_equality_cb cb, hsort_options_t options)
@@ -455,13 +502,12 @@ hsort_return_t hsort_test(size_t len, size_t size, bool is_signed, hsort_options
 {
 	void         *internal_array; /* Array that we will sort for the test */
 	void         *qsort_array;    /* Array that qsort will sort for a known-good check. */
-	void         *pos;
 	unsigned int  i;
 
 	/* Seed */
 	srand48(time(NULL));
 
-	internal_array = malloc(len * size);
+	internal_array = hsort_random_array(len, size, is_signed);
 	if (internal_array == NULL)
 		return HSORT_RET_ERROR;
 
@@ -469,40 +515,6 @@ hsort_return_t hsort_test(size_t len, size_t size, bool is_signed, hsort_options
 	if (qsort_array == NULL) {
 		free(internal_array);
 		return HSORT_RET_ERROR;
-	}
-
-	pos = internal_array;
-	for (i = 0; i < len; i++) {
-		switch (size) {
-			case 1:
-				if (is_signed)
-					*(int8_t *)pos = (int8_t)hsort_random_num(size, true);
-				else
-					*(u_int8_t *)pos = (u_int8_t)hsort_random_num(size, false);
-				break;
-
-			case 2:
-				if (is_signed)
-					*(int16_t *)pos = (int16_t)hsort_random_num(size, true);
-				else
-					*(u_int16_t *)pos = (u_int16_t)hsort_random_num(size, false);
-				break;
-
-			case 4:
-				if (is_signed)
-					*(int32_t *)pos = (int32_t)hsort_random_num(size, true);
-				else
-					*(u_int32_t *)pos = (u_int32_t)hsort_random_num(size, false);
-				break;
-
-			case 8:
-				if (is_signed)
-					*(int64_t *)pos = (int64_t)hsort_random_num(size, true);
-				else
-					*(u_int64_t *)pos = (u_int64_t)hsort_random_num(size, false);
-				break;
-		}
-		pos += size;
 	}
 
 	memcpy(qsort_array, internal_array, len*size);

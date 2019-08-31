@@ -39,7 +39,7 @@ typedef hsort_equality_t (*hsort_equality_cb)(void *left, void *right, size_t si
 hsort_return_t hsort_sort_int_array(void *arr, size_t len, size_t size, hsort_options_t options);
 hsort_return_t hsort_sort_uint_array(void *arr, size_t len, size_t size, hsort_options_t options);
 hsort_return_t hsort_sort_str(char *str, hsort_options_t options);
-hsort_return_t hsort_custom(void *arr, size_t len, size_t size, hsort_equality_cb cb, hsort_options_t options);
+hsort_return_t hsort_sort_custom(void *arr, size_t len, size_t size, hsort_equality_cb cb, hsort_options_t options);
 
 void           hsort_print_int_array(void *arr, size_t len, size_t size);
 void           hsort_print_uint_array(void *arr, size_t len, size_t size);

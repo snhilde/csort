@@ -24,6 +24,7 @@ typedef enum hsort_options {
 
 	HSORT_PRINT_BEFORE   = 1 << 5, /* Print array before sorting */
 	HSORT_PRINT_AFTER    = 1 << 6, /* Print array after sorting */
+	HSORT_PRINT_TIME     = 1 << 7, /* Print time taken to sort */
 } hsort_options_t;
 
 typedef enum hsort_return {

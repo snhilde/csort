@@ -76,47 +76,13 @@ static int check_array(void *arr_a, void *arr_b, size_t arr_a_len, size_t arr_b_
 }
 
 static void print_array(void *arr, size_t len, size_t size, bool is_signed)
-{
-	unsigned int i;
-
-	for (i=0; i<len; i++) {
-		switch (size) {
-			case 1:
-				if (is_signed)
-					printf("%" PRId8 " ", *(int8_t *)arr);
-				else
-					printf("%" PRIu8 " ", *(u_int8_t *)arr);
-				break;
-
-			case 2:
-				if (is_signed)
-					printf("%" PRId16 " ", *(int16_t *)arr);
-				else
-					printf("%" PRIu16 " ", *(u_int16_t *)arr);
-				break;
-
-			case 4:
-				if (is_signed)
-					printf("%" PRId32 " ", *(int32_t *)arr);
-				else
-					printf("%" PRIu32 " ", *(u_int32_t *)arr);
-				break;
-
-			case 8:
-				if (is_signed)
-					printf("%" PRId64 " ", *(int64_t *)arr);
-				else
-					printf("%" PRIu64 " ", *(u_int64_t *)arr);
-				break;
-		}
-		arr += size;
-	}
-	printf("\n");
-}
 
 int main(int argc, char *argv[])
 {
-	hsort_test(200, sizeof(int), true, HSORT_MERGE_SORT|HSORT_ORDER_ASC);
+	(void)check_array;
+	(void)print_array;
+
+	hsort_test(20, sizeof(int), true, HSORT_MERGE_SORT|HSORT_ORDER_ASC);
 
 	return EXIT_SUCCESS;
 }

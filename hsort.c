@@ -519,6 +519,11 @@ hsort_return_t hsort_test(size_t len, size_t size, bool is_signed, hsort_options
 
 	memcpy(qsort_array, internal_array, len*size);
 
+	if (is_signed)
+		ret = hsort_sort_custom(internal_array, len, size, hsort_int_cb, options);
+	else
+		ret = hsort_sort_custom(internal_array, len, size, hsort_uint_cb, options);
+
 	free(internal_array);
 	free(qsort_array);
 	return HSORT_RET_SUCCESS;

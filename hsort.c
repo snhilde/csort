@@ -414,6 +414,38 @@ void hsort_print_int_array(void *arr, size_t len, size_t size)
 	printf("\n");
 }
 
+void hsort_print_uint_array(void *arr, size_t len, size_t size)
+{
+	unsigned int i;
+
+	for (i=0; i<len; i++) {
+		switch (size) {
+			case 1:
+				printf("%" PRIu8, *(u_int8_t *)arr);
+				break;
+
+			case 2:
+				printf("%" PRIu16, *(u_int16_t *)arr);
+				break;
+
+			case 4:
+				printf("%" PRIu32, *(u_int32_t *)arr);
+				break;
+
+			case 8:
+				printf("%" PRIu64, *(u_int64_t *)arr);
+				break;
+
+			default:
+				return;
+		}
+		if (i != len-1)
+			printf(", ");
+		arr += size;
+	}
+	printf("\n");
+}
+
 hsort_return_t hsort_test(size_t len, size_t size, bool is_signed, hsort_options_t options)
 {
 	void         *internal_array; /* Array that we will sort for the test */

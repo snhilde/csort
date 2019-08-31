@@ -284,6 +284,9 @@ static void *hsort_random_array(size_t len, size_t size, bool is_signed)
 	void         *pos;
 	unsigned int  i;
 
+	/* Seed */
+	srand48(time(NULL));
+
 	array = malloc(len * size);
 	if (array == NULL)
 		return NULL;
@@ -503,9 +506,6 @@ hsort_return_t hsort_test(size_t len, size_t size, bool is_signed, hsort_options
 	void         *internal_array; /* Array that we will sort for the test */
 	void         *qsort_array;    /* Array that qsort will sort for a known-good check. */
 	unsigned int  i;
-
-	/* Seed */
-	srand48(time(NULL));
 
 	internal_array = hsort_random_array(len, size, is_signed);
 	if (internal_array == NULL)

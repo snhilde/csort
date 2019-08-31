@@ -1,6 +1,8 @@
 #ifndef __HSORT_H_
 #define __HSORT_H_
 
+#define _GNU_SOURCE /* necessary for qsort_r */
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
@@ -37,7 +39,7 @@ typedef enum hsort_equality {
 } hsort_equality_t;
 
 
-typedef hsort_equality_t (*hsort_equality_cb)(void *left, void *right, size_t size, hsort_options_t options);
+typedef hsort_equality_t (*hsort_equality_cb)(void *left, void *right, void *size);
 
 hsort_return_t hsort_sort_int_array(void *arr, size_t len, size_t size, hsort_options_t options);
 hsort_return_t hsort_sort_uint_array(void *arr, size_t len, size_t size, hsort_options_t options);

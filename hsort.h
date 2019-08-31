@@ -19,6 +19,9 @@ typedef enum hsort_options {
 	/* Sort orders */
 	HSORT_ORDER_ASC      = 1 << 3, /* Ascending order */
 	HSORT_ORDER_DESC     = 1 << 4, /* Descending order */
+
+	HSORT_PRINT_BEFORE   = 1 << 5, /* Print array before sorting */
+	HSORT_PRINT_AFTER    = 1 << 6, /* Print array after sorting */
 } hsort_options_t;
 
 typedef enum hsort_return {

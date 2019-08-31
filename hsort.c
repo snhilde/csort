@@ -260,6 +260,22 @@ static u_int64_t hsort_random_num(size_t size, bool is_signed)
 	 * Note: We don't care about overflow for our purposes.
 	 */
 	u_int64_t num = 0;
+	int       len;    /* 0 - max length of type */
+	int       i;
+	int       digit;  /* 0 - 9 */
+
+	srand48(time(NULL));
+
+	/* 1. Get number of digits in final number. */
+	len = lrand48() % hsort_max_length(size, is_signed);
+
+	for (i = 0; i < len; i++) {
+		/* 2. Calculate value for digit at index i. **/
+		digit  = lrand48() % 10;
+
+		/* 3. Insert digit at appropriate place. */
+		num   += (u_int64_t)pow(10, i) * digit;
+	}
 
 	return num;
 }

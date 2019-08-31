@@ -382,21 +382,36 @@ hsort_return_t hsort_custom(void *arr, size_t len, size_t size, hsort_equality_c
 	return HSORT_RET_ERROR;
 }
 
-
-/* --- API WRAPPERS --- */
-hsort_return_t hsort_int(void *arr, size_t len, size_t size, hsort_options_t options)
+void hsort_print_int_array(void *arr, size_t len, size_t size)
 {
-	return hsort_custom(arr, len, size, hsort_int_cb, options);
-}
+	unsigned int i;
 
-hsort_return_t hsort_uint(void *arr, size_t len, size_t size, hsort_options_t options)
-{
-	return hsort_custom(arr, len, size, hsort_uint_cb, options);
-}
+	for (i=0; i<len; i++) {
+		switch (size) {
+			case 1:
+				printf("%" PRId8, *(int8_t *)arr);
+				break;
 
-hsort_return_t hsort_str(char *str, hsort_options_t options)
-{
-	return hsort_custom(str, strlen(str), sizeof(*str), hsort_str_cb, options);
+			case 2:
+				printf("%" PRId16, *(int16_t *)arr);
+				break;
+
+			case 4:
+				printf("%" PRId32, *(int32_t *)arr);
+				break;
+
+			case 8:
+				printf("%" PRId64, *(int64_t *)arr);
+				break;
+
+			default:
+				return;
+		}
+		if (i != len-1)
+			printf(", ");
+		arr += size;
+	}
+	printf("\n");
 }
 
 hsort_return_t hsort_test(size_t len, size_t size, bool is_signed, hsort_options_t options)
@@ -458,4 +473,21 @@ hsort_return_t hsort_test(size_t len, size_t size, bool is_signed, hsort_options
 	free(internal_array);
 	free(qsort_array);
 	return HSORT_RET_SUCCESS;
+}
+
+
+/* --- API WRAPPERS --- */
+hsort_return_t hsort_int(void *arr, size_t len, size_t size, hsort_options_t options)
+{
+	return hsort_custom(arr, len, size, hsort_int_cb, options);
+}
+
+hsort_return_t hsort_uint(void *arr, size_t len, size_t size, hsort_options_t options)
+{
+	return hsort_custom(arr, len, size, hsort_uint_cb, options);
+}
+
+hsort_return_t hsort_str(char *str, hsort_options_t options)
+{
+	return hsort_custom(str, strlen(str), sizeof(*str), hsort_str_cb, options);
 }

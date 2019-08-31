@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <inttypes.h>
 #include <time.h>
 #include <math.h>
 
@@ -38,6 +40,7 @@ hsort_return_t hsort_int(void *arr, size_t len, size_t size, hsort_options_t opt
 hsort_return_t hsort_uint(void *arr, size_t len, size_t size, hsort_options_t options);
 hsort_return_t hsort_str(char *str, hsort_options_t options);
 hsort_return_t hsort_custom(void *arr, size_t len, size_t size, hsort_equality_cb cb, hsort_options_t options);
+
 hsort_return_t hsort_test(size_t len, size_t size, bool is_signed, hsort_options_t options);
 
 

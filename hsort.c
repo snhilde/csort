@@ -503,9 +503,9 @@ void hsort_print_str(char *str)
 
 hsort_return_t hsort_test(size_t len, size_t size, bool is_signed, hsort_options_t options)
 {
-	void         *internal_array; /* Array that we will sort for the test */
-	void         *qsort_array;    /* Array that qsort will sort for a known-good check. */
-	unsigned int  i;
+	void           *internal_array; /* Array that we will sort for the test */
+	void           *qsort_array;    /* Array that qsort will sort for a known-good check. */
+	hsort_return_t  ret;
 
 	internal_array = hsort_random_array(len, size, is_signed);
 	if (internal_array == NULL)
@@ -523,6 +523,11 @@ hsort_return_t hsort_test(size_t len, size_t size, bool is_signed, hsort_options
 		ret = hsort_sort_custom(internal_array, len, size, hsort_int_cb, options);
 	else
 		ret = hsort_sort_custom(internal_array, len, size, hsort_uint_cb, options);
+
+	if (ret != HSORT_RET_SUCCESS) {
+		printf("Sorting error\n");
+		return ret;
+	}
 
 	free(internal_array);
 	free(qsort_array);

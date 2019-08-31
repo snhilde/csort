@@ -75,8 +75,6 @@ static int check_array(void *arr_a, void *arr_b, size_t arr_a_len, size_t arr_b_
 	return 1;
 }
 
-static void print_array(void *arr, size_t len, size_t size, bool is_signed)
-
 int main(int argc, char *argv[])
 {
 	(void)check_array;

@@ -46,8 +46,7 @@ hsort_return_t hsort_sort_uint_array(void *arr, size_t len, size_t size, hsort_o
 hsort_return_t hsort_sort_str(char *str, hsort_options_t options);
 hsort_return_t hsort_sort_custom(void *arr, size_t len, size_t size, hsort_equality_cb cb, hsort_options_t options);
 
-void           hsort_print_int_array(void *arr, size_t len, size_t size);
-void           hsort_print_uint_array(void *arr, size_t len, size_t size);
+void           hsort_print_array(void *arr, size_t len, size_t size, bool is_signed);
 void           hsort_print_str(char *str);
 hsort_return_t hsort_test(size_t len, size_t size, bool is_signed, hsort_options_t options);
 

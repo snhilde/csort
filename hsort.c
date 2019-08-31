@@ -25,11 +25,11 @@ struct hsort_merge_node {
 /* --- CALLBACKS --- */
 static hsort_equality_t hsort_int_cb(const void *left, const void *right, void *thunk)
 {
-	int64_t a;
-	int64_t b;
-	size_t  size = *(size_t *)thunk;
+	struct hsort_data_t *data = *(hsort_data_t **)thunk;
+	int64_t              a;
+	int64_t              b;
 
-	switch (size) {
+	switch (data->size) {
 		case 1:
 			a = *(int8_t *)left;
 			b = *(int8_t *)right;
@@ -58,11 +58,11 @@ static hsort_equality_t hsort_int_cb(const void *left, const void *right, void *
 
 static hsort_equality_t hsort_uint_cb(const void *left, const void *right, void *thunk)
 {
-	u_int64_t a;
-	u_int64_t b;
-	size_t    size = *(size_t *)thunk;
+	struct hsort_data_t *data = *(hsort_data_t **)thunk;
+	int64_t              a;
+	int64_t              b;
 
-	switch (size) {
+	switch (data->size) {
 		case 1:
 			a = *(u_int8_t *)left;
 			b = *(u_int8_t *)right;
@@ -97,10 +97,9 @@ static hsort_equality_t hsort_uint_cb(const void *left, const void *right, void 
 
 static hsort_equality_t hsort_str_cb(const void *left, const void *right, void *thunk)
 {
-	char a = *(char *)left;
-	char b = *(char *)right;
-
-	(void)thunk;
+	struct hsort_data_t *data = *(hsort_data_t **)thunk;
+	char                 a = *(char *)left;
+	char                 b = *(char *)right;
 
 	if (a < b)
 		return HSORT_LT;

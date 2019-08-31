@@ -497,29 +497,7 @@ static hsort_return_t hsort_merge(void *arr, size_t len, size_t size, hsort_equa
 
 
 /* --- COMMON FUNCTION --- */
-hsort_return_t hsort_sort_custom(void *arr, size_t len, size_t size, hsort_equality_cb cb, hsort_options_t options)
-{
-	if (arr == NULL || len == 0 || size == 0 || cb == NULL || options == 0)
-		return HSORT_RET_INVALIDUSE;
-
-	if (options & HSORT_ORDER_DESC)
-		/* If Descending is set, make sure Ascending is not also set. */
-		options &= ~HSORT_ORDER_ASC;
-	else
-		/* Default to Ascending. */
-		options |= HSORT_ORDER_ASC;
-
-	if (options & HSORT_INSERTION_SORT)
-		return hsort_insertion(arr, len, size, cb, options);
-	else if (options & HSORT_SELECTION_SORT)
-		return hsort_selection(arr, len, size, cb, options);
-	else if (options & HSORT_MERGE_SORT)
-		return hsort_merge(arr, len, size, cb, options);
-
-	return HSORT_RET_ERROR;
-}
-
-void hsort_print_int_array(void *arr, size_t len, size_t size)
+static void hsort_print_int_array(void *arr, size_t len, size_t size)
 {
 	unsigned int i;
 
@@ -551,7 +529,7 @@ void hsort_print_int_array(void *arr, size_t len, size_t size)
 	printf("\n");
 }
 
-void hsort_print_uint_array(void *arr, size_t len, size_t size)
+static void hsort_print_uint_array(void *arr, size_t len, size_t size)
 {
 	unsigned int i;
 
@@ -583,9 +561,26 @@ void hsort_print_uint_array(void *arr, size_t len, size_t size)
 	printf("\n");
 }
 
-void hsort_print_str(char *str)
+hsort_return_t hsort_sort_custom(void *arr, size_t len, size_t size, hsort_equality_cb cb, hsort_options_t options)
 {
-	printf("%s\n", str);
+	if (arr == NULL || len == 0 || size == 0 || cb == NULL || options == 0)
+		return HSORT_RET_INVALIDUSE;
+
+	if (options & HSORT_ORDER_DESC)
+		/* If Descending is set, make sure Ascending is not also set. */
+		options &= ~HSORT_ORDER_ASC;
+	else
+		/* Default to Ascending. */
+		options |= HSORT_ORDER_ASC;
+
+	if (options & HSORT_INSERTION_SORT)
+		return hsort_insertion(arr, len, size, cb, options);
+	else if (options & HSORT_SELECTION_SORT)
+		return hsort_selection(arr, len, size, cb, options);
+	else if (options & HSORT_MERGE_SORT)
+		return hsort_merge(arr, len, size, cb, options);
+
+	return HSORT_RET_ERROR;
 }
 
 hsort_return_t hsort_test(size_t len, size_t size, bool is_signed, hsort_options_t options)
@@ -606,6 +601,9 @@ hsort_return_t hsort_test(size_t len, size_t size, bool is_signed, hsort_options
 
 	memcpy(qsort_array, internal_array, len*size);
 
+	if (options & HSORT_PRINT_BEFORE)
+		hsort_print_array(internal_array, len, size, is_signed);
+
 	/* Sort test array. */
 	if (is_signed)
 		ret = hsort_sort_custom(internal_array, len, size, hsort_int_cb, options);
@@ -616,6 +614,9 @@ hsort_return_t hsort_test(size_t len, size_t size, bool is_signed, hsort_options
 		printf("Sorting error\n");
 		return ret;
 	}
+
+	if (options & HSORT_PRINT_AFTER)
+		hsort_print_array(internal_array, len, size, is_signed);
 
 	/* Sort check array. */
 	if (is_signed)
@@ -634,15 +635,59 @@ hsort_return_t hsort_test(size_t len, size_t size, bool is_signed, hsort_options
 /* --- API WRAPPERS --- */
 hsort_return_t hsort_sort_int_array(void *arr, size_t len, size_t size, hsort_options_t options)
 {
-	return hsort_sort_custom(arr, len, size, hsort_int_cb, options);
+	hsort_return_t ret;
+
+	if (options & HSORT_PRINT_BEFORE)
+		hsort_print_array(arr, len, size, true);
+
+	ret = hsort_sort_custom(arr, len, size, hsort_int_cb, options);
+
+	if (options & HSORT_PRINT_AFTER)
+		hsort_print_array(arr, len, size, true);
+
+	return ret;
+
 }
 
 hsort_return_t hsort_sort_uint_array(void *arr, size_t len, size_t size, hsort_options_t options)
 {
-	return hsort_sort_custom(arr, len, size, hsort_uint_cb, options);
+	hsort_return_t ret;
+
+	if (options & HSORT_PRINT_BEFORE)
+		hsort_print_array(arr, len, size, true);
+
+	ret = hsort_sort_custom(arr, len, size, hsort_uint_cb, options);
+
+	if (options & HSORT_PRINT_AFTER)
+		hsort_print_array(arr, len, size, true);
+
+	return ret;
 }
 
 hsort_return_t hsort_sort_str(char *str, hsort_options_t options)
 {
-	return hsort_sort_custom(str, strlen(str), sizeof(*str), hsort_str_cb, options);
+	hsort_return_t ret;
+
+	if (options & HSORT_PRINT_BEFORE)
+		hsort_print_str(str);
+
+	ret = hsort_sort_custom(str, strlen(str), sizeof(*str), hsort_str_cb, options);
+
+	if (options & HSORT_PRINT_AFTER)
+		hsort_print_str(str);
+
+	return ret;
 }
+
+void hsort_print_array(void *arr, size_t len, size_t size, bool is_signed)
+{
+	if (is_signed)
+		return hsort_print_int_array(arr, len, size);
+	return hsort_print_uint_array(arr, len, size);
+}
+
+void hsort_print_str(char *str)
+{
+	printf("%s\n", str);
+}
+

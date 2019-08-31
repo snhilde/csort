@@ -519,7 +519,7 @@ hsort_return_t hsort_sort_int_array(void *arr, size_t len, size_t size, hsort_op
 	return hsort_sort_custom(arr, len, size, hsort_int_cb, options);
 }
 
-hsort_return_t hsort_uint(void *arr, size_t len, size_t size, hsort_options_t options)
+hsort_return_t hsort_sort_uint_array(void *arr, size_t len, size_t size, hsort_options_t options)
 {
 	return hsort_sort_custom(arr, len, size, hsort_uint_cb, options);
 }

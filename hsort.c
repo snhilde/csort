@@ -8,6 +8,12 @@ enum hsort_merge_step {
 	HSORT_MERGE_RIGHT,
 };
 
+struct hsort_data_t {
+	size_t          size;
+	hsort_options_t options;
+	bool            is_signed;
+}
+
 struct hsort_merge_node {
 	struct hsort_merge_node *next;
 	void                    *array;

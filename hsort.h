@@ -39,7 +39,7 @@ typedef enum hsort_equality {
 } hsort_equality_t;
 
 
-typedef hsort_equality_t (*hsort_equality_cb)(void *left, void *right, void *size);
+typedef hsort_equality_t (*hsort_equality_cb)(const void *left, const void *right, void *size);
 
 hsort_return_t hsort_sort_int_array(void *arr, size_t len, size_t size, hsort_options_t options);
 hsort_return_t hsort_sort_uint_array(void *arr, size_t len, size_t size, hsort_options_t options);

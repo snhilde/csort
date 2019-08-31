@@ -524,7 +524,7 @@ hsort_return_t hsort_sort_uint_array(void *arr, size_t len, size_t size, hsort_o
 	return hsort_sort_custom(arr, len, size, hsort_uint_cb, options);
 }
 
-hsort_return_t hsort_str(char *str, hsort_options_t options)
+hsort_return_t hsort_sort_str(char *str, hsort_options_t options)
 {
 	return hsort_sort_custom(str, strlen(str), sizeof(*str), hsort_str_cb, options);
 }

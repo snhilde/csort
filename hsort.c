@@ -227,8 +227,20 @@ static void hsort_pop(struct hsort_merge_node **top_node)
 	free(node);
 }
 
-static u_int64_t hsort_max_value(size_t size, bool is_signed)
+static int hsort_max_length(size_t size, bool is_signed)
 {
+	switch (size) {
+		case 1:
+			return 3;
+		case 2:
+			return 5;
+		case 4:
+			return 10;
+		default:
+			if (is_signed)
+				return 19;
+			return 20;
+	}
 }
 
 static u_int64_t hsort_random_num(size_t size, bool is_signed)

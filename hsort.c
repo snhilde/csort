@@ -17,10 +17,11 @@ struct hsort_merge_node {
 
 
 /* --- CALLBACKS --- */
-static hsort_equality_t hsort_int_cb(void *left, void *right, size_t size, hsort_options_t options)
+static hsort_equality_t hsort_int_cb(void *left, void *right, void *thunk)
 {
 	int64_t a;
 	int64_t b;
+	size_t  size = *(size_t *)thunk;
 
 	switch (size) {
 		case 1:
@@ -49,28 +50,35 @@ static hsort_equality_t hsort_int_cb(void *left, void *right, size_t size, hsort
 	return HSORT_EQ;
 }
 
-static hsort_equality_t hsort_uint_cb(void *left, void *right, size_t size, hsort_options_t options)
+static hsort_equality_t hsort_uint_cb(void *left, void *right, void *thunk)
 {
 	u_int64_t a;
 	u_int64_t b;
+	size_t    size = *(size_t *)thunk;
 
 	switch (size) {
 		case 1:
 			a = *(u_int8_t *)left;
 			b = *(u_int8_t *)right;
 			break;
+
 		case 2:
 			a = *(u_int16_t *)left;
 			b = *(u_int16_t *)right;
 			break;
+
 		case 4:
 			a = *(u_int32_t *)left;
 			b = *(u_int32_t *)right;
 			break;
+
 		case 8:
 			a = *(u_int64_t *)left;
 			b = *(u_int64_t *)right;
 			break;
+
+		default:
+			return HSORT_EQ; /* Discard comparison on invalid use. */
 	}
 
 	if (a < b)
@@ -81,10 +89,12 @@ static hsort_equality_t hsort_uint_cb(void *left, void *right, size_t size, hsor
 	return HSORT_EQ;
 }
 
-static hsort_equality_t hsort_str_cb(void *left, void *right, size_t size, hsort_options_t options)
+static hsort_equality_t hsort_str_cb(void *left, void *right, void *thunk)
 {
 	char a = *(char *)left;
 	char b = *(char *)right;
+
+	(void)thunk;
 
 	if (a < b)
 		return HSORT_LT;
@@ -185,7 +195,7 @@ static void hsort_merge_subarrays(struct hsort_merge_node *top_node, void *tmp_a
 			left_array += size;
 			left_len--;
 
-		} else if (cb(left_array, right_array, size, 0) != HSORT_GT) {
+		} else if (cb(left_array, right_array, &size) != HSORT_GT) {
 			/* Left value is less than or equal to right value. Move it to the array. */
 			hsort_swap(left_array, tmp_array, size);
 			left_array += size;
@@ -416,7 +426,7 @@ static hsort_return_t hsort_insertion(void *arr, size_t len, size_t size, hsort_
 	end = arr + (len*size);
 	for (selection = arr+size; selection < end; selection += size) {
 		for (test = arr; test < selection; test += size) {
-			if (cb(selection, test, size, options) != HSORT_GT) {
+			if (cb(selection, test, &size) != HSORT_GT) {
 				hsort_insert(test, selection, size);
 				break;
 			}
@@ -437,7 +447,7 @@ static hsort_return_t hsort_selection(void *arr, size_t len, size_t size, hsort_
 	for (current = arr; current < end-size; current += size) {
 		selection = current;
 		for (test = current+size; test < end; test += size) {
-			if (cb(selection, test, size, options) == HSORT_GT)
+			if (cb(selection, test, &size) == HSORT_GT)
 				selection = test;
 		}
 		if (selection != current)
@@ -596,6 +606,7 @@ hsort_return_t hsort_test(size_t len, size_t size, bool is_signed, hsort_options
 
 	memcpy(qsort_array, internal_array, len*size);
 
+	/* Sort test array. */
 	if (is_signed)
 		ret = hsort_sort_custom(internal_array, len, size, hsort_int_cb, options);
 	else
@@ -606,9 +617,17 @@ hsort_return_t hsort_test(size_t len, size_t size, bool is_signed, hsort_options
 		return ret;
 	}
 
+	/* Sort check array. */
+	if (is_signed)
+		qsort_r(qsort_array, len, size, hsort_int_cb, &size);
+	else
+		qsort_r(qsort_array, len, size, hsort_uint_cb, &size);
+
+	ret = hsort_check(internal_array, qsort_array, len, len, size, size, is_signed);
+
 	free(internal_array);
 	free(qsort_array);
-	return HSORT_RET_SUCCESS;
+	return ret;
 }
 
 

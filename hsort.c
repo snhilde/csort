@@ -360,7 +360,7 @@ static hsort_return_t hsort_merge(void *arr, size_t len, size_t size, hsort_equa
 
 
 /* --- COMMON FUNCTION --- */
-hsort_return_t hsort_custom(void *arr, size_t len, size_t size, hsort_equality_cb cb, hsort_options_t options)
+hsort_return_t hsort_sort_custom(void *arr, size_t len, size_t size, hsort_equality_cb cb, hsort_options_t options)
 {
 	if (arr == NULL || len == 0 || size == 0 || cb == NULL || options == 0)
 		return HSORT_RET_INVALIDUSE;
@@ -516,15 +516,15 @@ hsort_return_t hsort_test(size_t len, size_t size, bool is_signed, hsort_options
 /* --- API WRAPPERS --- */
 hsort_return_t hsort_int(void *arr, size_t len, size_t size, hsort_options_t options)
 {
-	return hsort_custom(arr, len, size, hsort_int_cb, options);
+	return hsort_sort_custom(arr, len, size, hsort_int_cb, options);
 }
 
 hsort_return_t hsort_uint(void *arr, size_t len, size_t size, hsort_options_t options)
 {
-	return hsort_custom(arr, len, size, hsort_uint_cb, options);
+	return hsort_sort_custom(arr, len, size, hsort_uint_cb, options);
 }
 
 hsort_return_t hsort_str(char *str, hsort_options_t options)
 {
-	return hsort_custom(str, strlen(str), sizeof(*str), hsort_str_cb, options);
+	return hsort_sort_custom(str, strlen(str), sizeof(*str), hsort_str_cb, options);
 }

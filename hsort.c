@@ -227,6 +227,10 @@ static void hsort_pop(struct hsort_merge_node **top_node)
 	free(node);
 }
 
+static u_int64_t hsort_max_value(size_t size, bool is_signed)
+{
+}
+
 static u_int64_t hsort_random_num(size_t size, bool is_signed)
 {
 	/* We're going to produce a pseudo-pseudo-random number here. The first pseudo is because

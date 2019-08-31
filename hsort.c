@@ -415,6 +415,21 @@ static hsort_return_t hsort_check(void *arr_a, void *arr_b, size_t arr_a_len, si
 	return HSORT_RET_SUCCESS;
 }
 
+static void hsort_print_time(struct timespec *start_time, struct timespec *end_time)
+{
+	long start_ms; /* Millisecond when timer was started */
+	long end_ms;   /* Millisecond when timer was stopped */
+	long elapsed;  /* Elapsed time in milliseconds */
+	long seconds;  /* Elapsed time in seconds */
+
+	start_ms = (start_time->tv_sec * 1000) + (start_time->tv_nsec / 1000000);
+	end_ms   = (end_time->tv_sec   * 1000) + (end_time->tv_nsec   / 1000000);
+	elapsed  = end_ms - start_ms;
+	seconds  = elapsed / 1000;
+
+	printf("Time: %ld.%03lds\n", seconds, elapsed % 1000);
+}
+
 
 /* --- SORTING ALGORITHMS --- */
 static hsort_return_t hsort_insertion(void *arr, size_t len, size_t size, hsort_equality_cb cb, hsort_options_t options)
@@ -563,6 +578,13 @@ static void hsort_print_uint_array(void *arr, size_t len, size_t size)
 
 hsort_return_t hsort_sort_custom(void *arr, size_t len, size_t size, hsort_equality_cb cb, hsort_options_t options)
 {
+	struct timespec start_time = {0};
+	struct timespec end_time   = {0};
+	hsort_return_t  ret;
+
+	if (options & HSORT_PRINT_TIME)
+		clock_gettime(CLOCK_MONOTONIC_RAW, &start_time);
+
 	if (arr == NULL || len == 0 || size == 0 || cb == NULL || options == 0)
 		return HSORT_RET_INVALIDUSE;
 
@@ -574,13 +596,20 @@ hsort_return_t hsort_sort_custom(void *arr, size_t len, size_t size, hsort_equal
 		options |= HSORT_ORDER_ASC;
 
 	if (options & HSORT_INSERTION_SORT)
-		return hsort_insertion(arr, len, size, cb, options);
+		ret = hsort_insertion(arr, len, size, cb, options);
 	else if (options & HSORT_SELECTION_SORT)
-		return hsort_selection(arr, len, size, cb, options);
+		ret = hsort_selection(arr, len, size, cb, options);
 	else if (options & HSORT_MERGE_SORT)
-		return hsort_merge(arr, len, size, cb, options);
+		ret = hsort_merge(arr, len, size, cb, options);
+	else
+		return HSORT_RET_ERROR;
 
-	return HSORT_RET_ERROR;
+	if (options & HSORT_PRINT_TIME) {
+		clock_gettime(CLOCK_MONOTONIC_RAW, &end_time);
+		hsort_print_time(&start_time, &end_time);
+	}
+
+	return ret;
 }
 
 hsort_return_t hsort_test(size_t len, size_t size, bool is_signed, hsort_options_t options)

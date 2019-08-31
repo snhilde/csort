@@ -264,8 +264,6 @@ static u_int64_t hsort_random_num(size_t size, bool is_signed)
 	int       i;
 	int       digit;  /* 0 - 9 */
 
-	srand48(time(NULL));
-
 	/* 1. Get number of digits in final number. */
 	len = lrand48() % hsort_max_length(size, is_signed);
 
@@ -408,6 +406,9 @@ hsort_return_t hsort_test(size_t len, size_t size, bool is_signed, hsort_options
 	void         *pos;
 	unsigned int  i;
 
+	/* Seed */
+	srand48(time(NULL));
+
 	internal_array = malloc(len * size);
 	if (internal_array == NULL)
 		return HSORT_RET_ERROR;
@@ -422,16 +423,31 @@ hsort_return_t hsort_test(size_t len, size_t size, bool is_signed, hsort_options
 	for (i = 0; i < len; i++) {
 		switch (size) {
 			case 1:
-				*(u_int8_t *)pos = hsort_random_num(size, is_signed);
+				if (is_signed)
+					*(int8_t *)pos = (int8_t)hsort_random_num(size, true);
+				else
+					*(u_int8_t *)pos = (u_int8_t)hsort_random_num(size, false);
 				break;
+
 			case 2:
-				*(u_int16_t *)pos = hsort_random_num(size, is_signed);
+				if (is_signed)
+					*(int16_t *)pos = (int16_t)hsort_random_num(size, true);
+				else
+					*(u_int16_t *)pos = (u_int16_t)hsort_random_num(size, false);
 				break;
+
 			case 4:
-				*(u_int32_t *)pos = hsort_random_num(size, is_signed);
+				if (is_signed)
+					*(int32_t *)pos = (int32_t)hsort_random_num(size, true);
+				else
+					*(u_int32_t *)pos = (u_int32_t)hsort_random_num(size, false);
 				break;
+
 			case 8:
-				*(u_int64_t *)pos = hsort_random_num(size, is_signed);
+				if (is_signed)
+					*(int64_t *)pos = (int64_t)hsort_random_num(size, true);
+				else
+					*(u_int64_t *)pos = (u_int64_t)hsort_random_num(size, false);
 				break;
 		}
 		pos += size;

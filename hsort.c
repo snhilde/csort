@@ -17,7 +17,7 @@ struct hsort_merge_node {
 
 
 /* --- CALLBACKS --- */
-static hsort_equality_t hsort_int_cb(void *left, void *right, void *thunk)
+static hsort_equality_t hsort_int_cb(const void *left, const void *right, void *thunk)
 {
 	int64_t a;
 	int64_t b;
@@ -50,7 +50,7 @@ static hsort_equality_t hsort_int_cb(void *left, void *right, void *thunk)
 	return HSORT_EQ;
 }
 
-static hsort_equality_t hsort_uint_cb(void *left, void *right, void *thunk)
+static hsort_equality_t hsort_uint_cb(const void *left, const void *right, void *thunk)
 {
 	u_int64_t a;
 	u_int64_t b;
@@ -89,7 +89,7 @@ static hsort_equality_t hsort_uint_cb(void *left, void *right, void *thunk)
 	return HSORT_EQ;
 }
 
-static hsort_equality_t hsort_str_cb(void *left, void *right, void *thunk)
+static hsort_equality_t hsort_str_cb(const void *left, const void *right, void *thunk)
 {
 	char a = *(char *)left;
 	char b = *(char *)right;

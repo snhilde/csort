@@ -446,6 +446,11 @@ void hsort_print_uint_array(void *arr, size_t len, size_t size)
 	printf("\n");
 }
 
+void hsort_print_str(char *str)
+{
+	printf("%s\n", str);
+}
+
 hsort_return_t hsort_test(size_t len, size_t size, bool is_signed, hsort_options_t options)
 {
 	void         *internal_array; /* Array that we will sort for the test */

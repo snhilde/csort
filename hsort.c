@@ -933,7 +933,7 @@ hsort_return_t hsort_sort_str(char *str, hsort_options_t options)
 	return ret;
 }
 
-hsort_return_t hsort_sort_custom(void *arr, size_t len, size_t size, bool is_signed, hsort_equality_cb cb, hsort_options_t options)
+hsort_return_t hsort_sort_custom(void *arr, size_t len, size_t size, hsort_options_t options, bool is_signed, hsort_equality_cb cb)
 {
 	hsort_data_t   data;
 	hsort_return_t ret;

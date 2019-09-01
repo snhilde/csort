@@ -257,6 +257,8 @@ static int hsort_max_length(hsort_data_t *data)
 			if (data->is_signed)
 				return 19;
 			return 20;
+		default:
+			return 0;
 	}
 }
 

@@ -314,14 +314,14 @@ static hsort_data_t *hsort_push(hsort_data_t *old_top, void *array, size_t len)
 	return new_top;
 }
 
-static hsort_data_t *hsort_discard_top(hsort_data_t *old_top)
+static void hsort_finish_level(hsort_data_t **level)
 {
-	hsort_data_t *new_top;
+	hsort_data_t *old_level;
 
-	new_top = old_top->next;
+	old_level = *level;
+	*level    = (*level)->next;
 
-	free(old_top);
-	return new_top;
+	free(old_level);
 }
 
 static hsort_data_t *hsort_merge_create_stack(hsort_data_t *data)
@@ -654,19 +654,19 @@ static hsort_return_t hsort_merge_by_stack(hsort_data_t *data, void *tmp_array)
 		if (current_level->step == HSORT_MERGE_HALVES) {
 			/* 3. Combine: Merge halves and move up a level. */
 			hsort_merge_subarrays(current_level, tmp_array);
-			current_level = hsort_discard_top(current_level);
+			hsort_finish_level(&current_level);
 
 		} else if (current_level->step == HSORT_DESCEND_RIGHT) {
 			/* 1. Divide: Work down the right. */
 			current_level->step = HSORT_MERGE_HALVES;
-			tmp_len        = current_level->len - current_level->len / 2;
+			tmp_len             = current_level->len - current_level->len / 2;
 			if (tmp_len > 1)
 				current_level = hsort_push(current_level, current_level->array + ((current_level->len / 2) * current_level->size), tmp_len);
 
 		} else {
 			/* 1. Divide: Work down the left. */
 			current_level->step = HSORT_DESCEND_RIGHT;
-			tmp_len        = current_level->len / 2;
+			tmp_len             = current_level->len / 2;
 			if (tmp_len > 1)
 				current_level = hsort_push(current_level, current_level->array, tmp_len);
 		}

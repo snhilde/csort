@@ -753,15 +753,15 @@ static hsort_return_t hsort_sort_internal(hsort_data_t *data)
 	if (data->array == NULL || data->len == 0 || data->size == 0 || data->options == 0 || data->cb == NULL)
 		return HSORT_RET_INVALIDUSE;
 
-	if (data->options & HSORT_PRINT_TIME)
-		clock_gettime(CLOCK_MONOTONIC_RAW, &start_time);
-
 	if (data->options & HSORT_ORDER_DESC)
 		/* If Descending is set, make sure Ascending is not also set. */
 		data->options &= ~HSORT_ORDER_ASC;
 	else
 		/* Default to Ascending. */
 		data->options |= HSORT_ORDER_ASC;
+
+	if (data->options & HSORT_PRINT_TIME)
+		clock_gettime(CLOCK_MONOTONIC_RAW, &start_time);
 
 	if (data->options & HSORT_INSERTION_SORT)
 		ret = hsort_insertion(data);

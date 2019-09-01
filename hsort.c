@@ -243,7 +243,7 @@ static void hsort_insert(void *left, void *right, size_t size)
 	hsort_swap(right, &tmp, size);
 }
 
-static void hsort_merge_subarrays(hsort_data_t *top_node, void *tmp_array)
+static void hsort_merge_subarrays(hsort_data_t *data, void *tmp_array)
 {
 	void   *head;
 	size_t  left_len;
@@ -255,41 +255,41 @@ static void hsort_merge_subarrays(hsort_data_t *top_node, void *tmp_array)
 	/* Keep a reference to the beginning of the temporary array. */
 	head = tmp_array;
 
-	left_len  = top_node->len / 2;
-	right_len = top_node->len - left_len;
+	left_len  = data->len / 2;
+	right_len = data->len - left_len;
 
-	left_index  = top_node->array;
-	right_index = top_node->array + (left_len * top_node->size);
+	left_index  = data->array;
+	right_index = data->array + (left_len * data->size);
 
-	for (i = 0; i < top_node->len; i++) {
+	for (i = 0; i < data->len; i++) {
 		if (left_len == 0) {
 			/* Left side is done. Move over the right value. */
-			hsort_swap(right_index, tmp_array, top_node->size);
-			right_index += top_node->size;
+			hsort_swap(right_index, tmp_array, data->size);
+			right_index += data->size;
 			right_len--;
 
 		} else if (right_len == 0) {
 			/* Right side is done. Move over the left value. */
-			hsort_swap(left_index, tmp_array, top_node->size);
-			left_index += top_node->size;
+			hsort_swap(left_index, tmp_array, data->size);
+			left_index += data->size;
 			left_len--;
 
-		} else if (top_node->cb(left_index, right_index, top_node) != (top_node->options & HSORT_ORDER_ASC ? HSORT_GT : HSORT_LT)) {
+		} else if (data->cb(left_index, right_index, data) != (data->options & HSORT_ORDER_ASC ? HSORT_GT : HSORT_LT)) {
 			/* Left value is less than or equal to right value. Move it to the array. */
-			hsort_swap(left_index, tmp_array, top_node->size);
-			left_index += top_node->size;
+			hsort_swap(left_index, tmp_array, data->size);
+			left_index += data->size;
 			left_len--;
 
 		} else {
 			/* Right value is less than left value. Move it to the array. */
-			hsort_swap(right_index, tmp_array, top_node->size);
-			right_index += top_node->size;
+			hsort_swap(right_index, tmp_array, data->size);
+			right_index += data->size;
 			right_len--;
 		}
 
-		tmp_array += top_node->size;
+		tmp_array += data->size;
 	}
-	memcpy(top_node->array, head, top_node->len * top_node->size);
+	memcpy(data->array, head, data->len * data->size);
 }
 
 static hsort_data_t *hsort_push(hsort_data_t *old_top, void *array, size_t len)

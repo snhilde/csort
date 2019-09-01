@@ -8,11 +8,13 @@ enum hsort_merge_step {
 	HSORT_MERGE_RIGHT,
 };
 
-struct hsort_data_t {
-	size_t          size;
-	hsort_options_t options;
-	bool            is_signed;
-}
+typedef struct hsort_data {
+	void            *array;
+	size_t           len;
+	size_t           size;
+	hsort_options_t  options;
+	bool             is_signed;
+} hsort_data_t;
 
 struct hsort_merge_node {
 	struct hsort_merge_node *next;
@@ -25,9 +27,9 @@ struct hsort_merge_node {
 /* --- CALLBACKS --- */
 static hsort_equality_t hsort_int_cb(const void *left, const void *right, void *thunk)
 {
-	struct hsort_data_t *data = *(hsort_data_t **)thunk;
-	int64_t              a;
-	int64_t              b;
+	hsort_data_t *data = *(hsort_data_t **)thunk;
+	int64_t       a;
+	int64_t       b;
 
 	switch (data->size) {
 		case 1:
@@ -58,9 +60,9 @@ static hsort_equality_t hsort_int_cb(const void *left, const void *right, void *
 
 static hsort_equality_t hsort_uint_cb(const void *left, const void *right, void *thunk)
 {
-	struct hsort_data_t *data = *(hsort_data_t **)thunk;
-	int64_t              a;
-	int64_t              b;
+	hsort_data_t *data = *(hsort_data_t **)thunk;
+	int64_t       a;
+	int64_t       b;
 
 	switch (data->size) {
 		case 1:
@@ -97,9 +99,9 @@ static hsort_equality_t hsort_uint_cb(const void *left, const void *right, void 
 
 static hsort_equality_t hsort_str_cb(const void *left, const void *right, void *thunk)
 {
-	struct hsort_data_t *data = *(hsort_data_t **)thunk;
-	char                 a = *(char *)left;
-	char                 b = *(char *)right;
+	hsort_data_t *data = *(hsort_data_t **)thunk;
+	char          a    = *(char *)left;
+	char          b    = *(char *)right;
 
 	if (a < b)
 		return HSORT_LT;
@@ -242,23 +244,23 @@ static void hsort_pop(struct hsort_merge_node **top_node)
 	free(node);
 }
 
-static int hsort_max_length(size_t size, bool is_signed)
+static int hsort_max_length(hsort_data_t *data)
 {
-	switch (size) {
+	switch (data->size) {
 		case 1:
 			return 3;
 		case 2:
 			return 5;
 		case 4:
 			return 10;
-		default:
-			if (is_signed)
+		case 8:
+			if (data->is_signed)
 				return 19;
 			return 20;
 	}
 }
 
-static u_int64_t hsort_random_num(size_t size, bool is_signed)
+static u_int64_t hsort_random_num(hsort_data_t *data)
 {
 	/* We're going to produce a pseudo-pseudo-random number here. The first pseudo is because
  	 * the generator function we're going to use (lrand48) generates pseudo-random numbers.
@@ -280,91 +282,95 @@ static u_int64_t hsort_random_num(size_t size, bool is_signed)
 	int       digit;  /* 0 - 9 */
 
 	/* 1. Get number of digits in final number. */
-	len = lrand48() % hsort_max_length(size, is_signed);
+	len = lrand48() % hsort_max_length(data);
 
 	for (i = 0; i < len; i++) {
 		/* 2. Calculate value for digit at index i. **/
-		digit  = lrand48() % 10;
+		digit = lrand48() % 10;
 
 		/* 3. Insert digit at appropriate place. */
-		num   += (u_int64_t)pow(10, i) * digit;
+		num += (u_int64_t)pow(10, i) * digit;
 	}
 
 	return num;
 }
 
-static void *hsort_random_array(size_t len, size_t size, bool is_signed)
+static hsort_return_t hsort_random_array(hsort_data_t *data)
 {
-	void         *array;
 	void         *pos;
 	unsigned int  i;
 
 	/* Seed */
 	srand48(time(NULL));
 
-	array = malloc(len * size);
-	if (array == NULL)
-		return NULL;
+	data->array = malloc(data->len * data->size);
+	if (data->array == NULL)
+		return HSORT_RET_ERROR;
 
-	pos = array;
-	for (i = 0; i < len; i++) {
-		switch (size) {
+	pos = data->array;
+	for (i = 0; i < data->len; i++) {
+		switch (data->size) {
 			case 1:
-				if (is_signed)
-					*(int8_t *)pos = (int8_t)hsort_random_num(size, true);
+				if (data->is_signed)
+					*(int8_t *)pos = (int8_t)hsort_random_num(data);
 				else
-					*(u_int8_t *)pos = (u_int8_t)hsort_random_num(size, false);
+					*(u_int8_t *)pos = (u_int8_t)hsort_random_num(data);
 				break;
 
 			case 2:
-				if (is_signed)
-					*(int16_t *)pos = (int16_t)hsort_random_num(size, true);
+				if (data->is_signed)
+					*(int16_t *)pos = (int16_t)hsort_random_num(data);
 				else
-					*(u_int16_t *)pos = (u_int16_t)hsort_random_num(size, false);
+					*(u_int16_t *)pos = (u_int16_t)hsort_random_num(data);
 				break;
 
 			case 4:
-				if (is_signed)
-					*(int32_t *)pos = (int32_t)hsort_random_num(size, true);
+				if (data->is_signed)
+					*(int32_t *)pos = (int32_t)hsort_random_num(data);
 				else
-					*(u_int32_t *)pos = (u_int32_t)hsort_random_num(size, false);
+					*(u_int32_t *)pos = (u_int32_t)hsort_random_num(data);
 				break;
 
 			case 8:
-				if (is_signed)
-					*(int64_t *)pos = (int64_t)hsort_random_num(size, true);
+				if (data->is_signed)
+					*(int64_t *)pos = (int64_t)hsort_random_num(data);
 				else
-					*(u_int64_t *)pos = (u_int64_t)hsort_random_num(size, false);
+					*(u_int64_t *)pos = (u_int64_t)hsort_random_num(data);
 				break;
 		}
-		pos += size;
+		pos += data->size;
 	}
 
-	return array;
+	return HSORT_RET_SUCCESS;
 }
 
-static hsort_return_t hsort_check(void *arr_a, void *arr_b, size_t arr_a_len, size_t arr_b_len, size_t a_size, size_t b_size, bool is_signed)
+static hsort_return_t hsort_check(hsort_data_t *data1, hsort_data_t *data2)
 {
-	unsigned int i;
-	u_int64_t    a;
-	u_int64_t    b;
+	void         *arr_a;
+	void         *arr_b;
+	unsigned int  i;
+	u_int64_t     a;
+	u_int64_t     b;
+
+	arr_a = data1->array;
+	arr_b = data2->array;
 
 	/* Quick sanity checks */
-	if (arr_a_len != arr_b_len) {
-		printf("Array lengths do not match\n" "Array A: %zu\n" "Array B: %zu", arr_a_len, arr_b_len);
+	if (data1->len != data2->len) {
+		printf("Array lengths do not match\n" "Array A: %zu\n" "Array B: %zu", data1->len, data2->len);
 		return HSORT_RET_INVALIDUSE;
 	}
 
-	if (a_size != b_size) {
-		printf("Array data sizes do not match\n" "Array A: %zu\n" "Array B: %zu", a_size, b_size);
+	if (data1->size != data2->size) {
+		printf("Array data sizes do not match\n" "Array A: %zu\n" "Array B: %zu", data1->size, data2->size);
 		return HSORT_RET_INVALIDUSE;
 	}
 
-	for (i = 0; i < arr_a_len; i++) {
+	for (i = 0; i < data1->len; i++) {
 		/* Get the value at each index. */
-		switch (a_size) {
+		switch (data1->size) {
 			case 1:
-				if (is_signed) {
+				if (data1->is_signed) {
 					a = *(int8_t *)arr_a;
 					b = *(int8_t *)arr_b;
 				} else {
@@ -374,7 +380,7 @@ static hsort_return_t hsort_check(void *arr_a, void *arr_b, size_t arr_a_len, si
 				break;
 
 			case 2:
-				if (is_signed) {
+				if (data1->is_signed) {
 					a = *(int16_t *)arr_a;
 					b = *(int16_t *)arr_b;
 				} else {
@@ -384,7 +390,7 @@ static hsort_return_t hsort_check(void *arr_a, void *arr_b, size_t arr_a_len, si
 				break;
 
 			case 4:
-				if (is_signed) {
+				if (data1->is_signed) {
 					a = *(int32_t *)arr_a;
 					b = *(int32_t *)arr_b;
 				} else {
@@ -394,7 +400,7 @@ static hsort_return_t hsort_check(void *arr_a, void *arr_b, size_t arr_a_len, si
 				break;
 
 			case 8:
-				if (is_signed) {
+				if (data1->is_signed) {
 					a = *(int64_t *)arr_a;
 					b = *(int64_t *)arr_b;
 				} else {
@@ -412,8 +418,8 @@ static hsort_return_t hsort_check(void *arr_a, void *arr_b, size_t arr_a_len, si
 			return HSORT_RET_ERROR;
 
 		/* Advance to the next index. */
-		arr_a += a_size;
-		arr_b += b_size;
+		arr_a += data1->size;
+		arr_b += data2->size;
 	}
 
 	/* If we made it this far, then all values were equal. */
@@ -437,17 +443,17 @@ static void hsort_print_time(struct timespec *start_time, struct timespec *end_t
 
 
 /* --- SORTING ALGORITHMS --- */
-static hsort_return_t hsort_insertion(void *arr, size_t len, size_t size, hsort_equality_cb cb, hsort_options_t options)
+static hsort_return_t hsort_insertion(hsort_data_t *data, hsort_equality_cb cb)
 {
 	void *end;
 	void *selection;
 	void *test;
 
-	end = arr + (len*size);
-	for (selection = arr+size; selection < end; selection += size) {
-		for (test = arr; test < selection; test += size) {
-			if (cb(selection, test, &size) != HSORT_GT) {
-				hsort_insert(test, selection, size);
+	end = data->array + (data->len * data->size);
+	for (selection = data->array + data->size; selection < end; selection += data->size) {
+		for (test = data->array; test < selection; test += data->size) {
+			if (cb(selection, test, &(data->size)) != HSORT_GT) {
+				hsort_insert(test, selection, data->size);
 				break;
 			}
 		}
@@ -456,41 +462,43 @@ static hsort_return_t hsort_insertion(void *arr, size_t len, size_t size, hsort_
 	return HSORT_RET_SUCCESS;
 }
 
-static hsort_return_t hsort_selection(void *arr, size_t len, size_t size, hsort_equality_cb cb, hsort_options_t options)
+static hsort_return_t hsort_selection(hsort_data_t *data, hsort_equality_cb cb)
 {
 	void *end;
 	void *current;
 	void *selection;
 	void *test;
 
-	end = arr + (len*size);
-	for (current = arr; current < end-size; current += size) {
+	end = data->array + (data->len * data->size);
+	for (current = data->array; current < end - data->size; current += data->size) {
 		selection = current;
-		for (test = current+size; test < end; test += size) {
-			if (cb(selection, test, &size) == HSORT_GT)
+		for (test = current + data->size; test < end; test += data->size) {
+			if (cb(selection, test, &(data->size)) == HSORT_GT)
 				selection = test;
 		}
 		if (selection != current)
-			hsort_swap(current, selection, size);
+			hsort_swap(current, selection, data->size);
 	}
 
 	return HSORT_RET_SUCCESS;
 }
 
-static hsort_return_t hsort_merge(void *arr, size_t len, size_t size, hsort_equality_cb cb, hsort_options_t options)
+static hsort_return_t hsort_merge(hsort_data_t *data, hsort_equality_cb cb)
 {
 	struct hsort_merge_node *top_node = NULL;
 	void                    *tmp_arr;
 	size_t                   tmp_len;
 
-	tmp_arr = calloc(len, size);
+	tmp_arr = calloc(data->len, data->size);
+	if (tmp_arr == NULL)
+		return HSORT_RET_ERROR;
 
-	hsort_push(&top_node, arr, len);
+	hsort_push(&top_node, data->array, data->len);
 
 	while (top_node != NULL) {
 		if (top_node->step == HSORT_MERGE_RIGHT) {
 			/* Both halves are sorted. Merge them together. */
-			hsort_merge_subarrays(top_node, tmp_arr, size, cb);
+			hsort_merge_subarrays(top_node, tmp_arr, data->size, cb);
 
 			/* Merge is done. Remove it from stack and keep going. */
 			hsort_pop(&top_node);
@@ -500,7 +508,7 @@ static hsort_return_t hsort_merge(void *arr, size_t len, size_t size, hsort_equa
 			top_node->step = HSORT_MERGE_RIGHT;
 			tmp_len        = top_node->len / 2;
 			if (tmp_len > 1)
-				hsort_push(&top_node, top_node->array + ((top_node->len + 1)/2) * size, tmp_len);
+				hsort_push(&top_node, top_node->array + ((top_node->len + 1)/2) * data->size, tmp_len);
 
 		} else {
 			/* Start working on the left half, using the larger portion. */
@@ -516,13 +524,14 @@ static hsort_return_t hsort_merge(void *arr, size_t len, size_t size, hsort_equa
 }
 
 
-/* --- COMMON FUNCTION --- */
-static void hsort_print_int_array(void *arr, size_t len, size_t size)
+/* --- COMMON FUNCTIONS --- */
+static void hsort_print_int_array(hsort_data_t *data)
 {
-	unsigned int i;
+	void         *arr = data->array;
+	unsigned int  i;
 
-	for (i=0; i<len; i++) {
-		switch (size) {
+	for (i = 0; i < data->len; i++) {
+		switch (data->size) {
 			case 1:
 				printf("%" PRId8, *(int8_t *)arr);
 				break;
@@ -542,19 +551,20 @@ static void hsort_print_int_array(void *arr, size_t len, size_t size)
 			default:
 				return;
 		}
-		if (i != len-1)
+		if (i != data->len - 1)
 			printf(", ");
-		arr += size;
+		arr += data->size;
 	}
 	printf("\n");
 }
 
-static void hsort_print_uint_array(void *arr, size_t len, size_t size)
+static void hsort_print_uint_array(hsort_data_t *data)
 {
-	unsigned int i;
+	void         *arr = data->array;
+	unsigned int  i;
 
-	for (i=0; i<len; i++) {
-		switch (size) {
+	for (i = 0; i < data->len; i++) {
+		switch (data->size) {
 			case 1:
 				printf("%" PRIu8, *(u_int8_t *)arr);
 				break;
@@ -574,42 +584,42 @@ static void hsort_print_uint_array(void *arr, size_t len, size_t size)
 			default:
 				return;
 		}
-		if (i != len-1)
+		if (i != data->len-1)
 			printf(", ");
-		arr += size;
+		arr += data->size;
 	}
 	printf("\n");
 }
 
-hsort_return_t hsort_sort_custom(void *arr, size_t len, size_t size, hsort_equality_cb cb, hsort_options_t options)
+static hsort_return_t hsort_sort_internal(hsort_data_t *data, hsort_equality_cb cb)
 {
 	struct timespec start_time = {0};
 	struct timespec end_time   = {0};
 	hsort_return_t  ret;
 
-	if (options & HSORT_PRINT_TIME)
-		clock_gettime(CLOCK_MONOTONIC_RAW, &start_time);
-
-	if (arr == NULL || len == 0 || size == 0 || cb == NULL || options == 0)
+	if (data->array == NULL || data->len == 0 || data->size == 0 || data->options == 0 || cb == NULL)
 		return HSORT_RET_INVALIDUSE;
 
-	if (options & HSORT_ORDER_DESC)
+	if (data->options & HSORT_PRINT_TIME)
+		clock_gettime(CLOCK_MONOTONIC_RAW, &start_time);
+
+	if (data->options & HSORT_ORDER_DESC)
 		/* If Descending is set, make sure Ascending is not also set. */
-		options &= ~HSORT_ORDER_ASC;
+		data->options &= ~HSORT_ORDER_ASC;
 	else
 		/* Default to Ascending. */
-		options |= HSORT_ORDER_ASC;
+		data->options |= HSORT_ORDER_ASC;
 
-	if (options & HSORT_INSERTION_SORT)
-		ret = hsort_insertion(arr, len, size, cb, options);
-	else if (options & HSORT_SELECTION_SORT)
-		ret = hsort_selection(arr, len, size, cb, options);
-	else if (options & HSORT_MERGE_SORT)
-		ret = hsort_merge(arr, len, size, cb, options);
+	if (data->options & HSORT_INSERTION_SORT)
+		ret = hsort_insertion(data, cb);
+	else if (data->options & HSORT_SELECTION_SORT)
+		ret = hsort_selection(data, cb);
+	else if (data->options & HSORT_MERGE_SORT)
+		ret = hsort_merge(data, cb);
 	else
 		return HSORT_RET_ERROR;
 
-	if (options & HSORT_PRINT_TIME) {
+	if (data->options & HSORT_PRINT_TIME) {
 		clock_gettime(CLOCK_MONOTONIC_RAW, &end_time);
 		hsort_print_time(&start_time, &end_time);
 	}
@@ -617,67 +627,26 @@ hsort_return_t hsort_sort_custom(void *arr, size_t len, size_t size, hsort_equal
 	return ret;
 }
 
-hsort_return_t hsort_test(size_t len, size_t size, bool is_signed, hsort_options_t options)
-{
-	void           *internal_array; /* Array that we will sort for the test */
-	void           *qsort_array;    /* Array that qsort will sort for a known-good check. */
-	hsort_return_t  ret;
-
-	internal_array = hsort_random_array(len, size, is_signed);
-	if (internal_array == NULL)
-		return HSORT_RET_ERROR;
-
-	qsort_array = malloc(len * size);
-	if (qsort_array == NULL) {
-		free(internal_array);
-		return HSORT_RET_ERROR;
-	}
-
-	memcpy(qsort_array, internal_array, len*size);
-
-	if (options & HSORT_PRINT_BEFORE)
-		hsort_print_array(internal_array, len, size, is_signed);
-
-	/* Sort test array. */
-	if (is_signed)
-		ret = hsort_sort_custom(internal_array, len, size, hsort_int_cb, options);
-	else
-		ret = hsort_sort_custom(internal_array, len, size, hsort_uint_cb, options);
-
-	if (ret != HSORT_RET_SUCCESS) {
-		printf("Sorting error\n");
-		return ret;
-	}
-
-	if (options & HSORT_PRINT_AFTER)
-		hsort_print_array(internal_array, len, size, is_signed);
-
-	/* Sort check array. */
-	if (is_signed)
-		qsort_r(qsort_array, len, size, hsort_int_cb, &size);
-	else
-		qsort_r(qsort_array, len, size, hsort_uint_cb, &size);
-
-	ret = hsort_check(internal_array, qsort_array, len, len, size, size, is_signed);
-
-	free(internal_array);
-	free(qsort_array);
-	return ret;
-}
-
 
 /* --- API WRAPPERS --- */
 hsort_return_t hsort_sort_int_array(void *arr, size_t len, size_t size, hsort_options_t options)
 {
+	hsort_data_t   data;
 	hsort_return_t ret;
 
-	if (options & HSORT_PRINT_BEFORE)
-		hsort_print_array(arr, len, size, true);
+	data.array     = arr;
+	data.len       = len;
+	data.size      = size;
+	data.options   = options;
+	data.is_signed = true;
 
-	ret = hsort_sort_custom(arr, len, size, hsort_int_cb, options);
+	if (options & HSORT_PRINT_BEFORE)
+		hsort_print_array(data.array, data.len, data.size, data.is_signed);
+
+	ret = hsort_sort_internal(&data, hsort_int_cb);
 
 	if (options & HSORT_PRINT_AFTER)
-		hsort_print_array(arr, len, size, true);
+		hsort_print_array(data.array, data.len, data.size, data.is_signed);
 
 	return ret;
 
@@ -685,27 +654,41 @@ hsort_return_t hsort_sort_int_array(void *arr, size_t len, size_t size, hsort_op
 
 hsort_return_t hsort_sort_uint_array(void *arr, size_t len, size_t size, hsort_options_t options)
 {
+	hsort_data_t   data;
 	hsort_return_t ret;
 
-	if (options & HSORT_PRINT_BEFORE)
-		hsort_print_array(arr, len, size, true);
+	data.array     = arr;
+	data.len       = len;
+	data.size      = size;
+	data.options   = options;
+	data.is_signed = false;
 
-	ret = hsort_sort_custom(arr, len, size, hsort_uint_cb, options);
+	if (options & HSORT_PRINT_BEFORE)
+		hsort_print_array(data.array, data.len, data.size, data.is_signed);
+
+	ret = hsort_sort_internal(&data, hsort_uint_cb);
 
 	if (options & HSORT_PRINT_AFTER)
-		hsort_print_array(arr, len, size, true);
+		hsort_print_array(data.array, data.len, data.size, data.is_signed);
 
 	return ret;
 }
 
 hsort_return_t hsort_sort_str(char *str, hsort_options_t options)
 {
+	hsort_data_t   data;
 	hsort_return_t ret;
+
+	data.array     = (void *)str;
+	data.len       = strlen(str);
+	data.size      = sizeof(*str);
+	data.options   = options;
+	data.is_signed = true;
 
 	if (options & HSORT_PRINT_BEFORE)
 		hsort_print_str(str);
 
-	ret = hsort_sort_custom(str, strlen(str), sizeof(*str), hsort_str_cb, options);
+	ret = hsort_sort_internal(&data, hsort_str_cb);
 
 	if (options & HSORT_PRINT_AFTER)
 		hsort_print_str(str);
@@ -713,11 +696,40 @@ hsort_return_t hsort_sort_str(char *str, hsort_options_t options)
 	return ret;
 }
 
+hsort_return_t hsort_sort_custom(void *arr, size_t len, size_t size, bool is_signed, hsort_equality_cb cb, hsort_options_t options)
+{
+	hsort_data_t   data;
+	hsort_return_t ret;
+
+	data.array     = arr;
+	data.len       = len;
+	data.size      = size;
+	data.options   = options;
+	data.is_signed = is_signed;
+
+	if (options & HSORT_PRINT_BEFORE)
+		hsort_print_array(data.array, data.len, data.size, data.is_signed);
+
+	ret = hsort_sort_internal(&data, cb);
+
+	if (options & HSORT_PRINT_AFTER)
+		hsort_print_array(data.array, data.len, data.size, data.is_signed);
+
+	return ret;
+}
+
 void hsort_print_array(void *arr, size_t len, size_t size, bool is_signed)
 {
-	if (is_signed)
-		return hsort_print_int_array(arr, len, size);
-	return hsort_print_uint_array(arr, len, size);
+	hsort_data_t data;
+
+	data.array     = arr;
+	data.len       = len;
+	data.size      = size;
+	data.is_signed = is_signed;
+
+	if (data.is_signed)
+		return hsort_print_int_array(&data);
+	return hsort_print_uint_array(&data);
 }
 
 void hsort_print_str(char *str)
@@ -725,3 +737,61 @@ void hsort_print_str(char *str)
 	printf("%s\n", str);
 }
 
+hsort_return_t hsort_test(size_t len, size_t size, bool is_signed, hsort_options_t options)
+{
+	hsort_data_t   test;  /* Will contain the array that we will sort for the test */
+	hsort_data_t   check; /* Will contain the array that qsort will sort for a known-good check. */
+	hsort_return_t ret;
+
+	test.len        = len;
+	test.size       = size;
+	test.options    = options;
+	test.is_signed  = is_signed;
+
+	check.len       = len;
+	check.size      = size;
+	check.options   = options;
+	check.is_signed = is_signed;
+
+	if (hsort_random_array(&test) != HSORT_RET_SUCCESS)
+		return HSORT_RET_ERROR;
+
+	check.array = malloc(check.len * check.size);
+	if (check.array == NULL) {
+		free(test.array);
+		return HSORT_RET_ERROR;
+	}
+
+	memcpy(check.array, test.array, test.len * test.size);
+
+	if (options & HSORT_PRINT_BEFORE)
+		hsort_print_array(test.array, test.len, test.size, test.is_signed);
+
+	/* Sort test array. */
+	if (is_signed)
+		ret = hsort_sort_internal(&test, hsort_int_cb);
+	else
+		ret = hsort_sort_internal(&test, hsort_uint_cb);
+
+	if (ret != HSORT_RET_SUCCESS) {
+		printf("Sorting error\n");
+		free(test.array);
+		free(check.array);
+		return ret;
+	}
+
+	if (options & HSORT_PRINT_AFTER)
+		hsort_print_array(test.array, test.len, test.size, test.is_signed);
+
+	/* Sort check array. */
+	if (is_signed)
+		qsort_r(check.array, check.len, check.size, hsort_int_cb, &check);
+	else
+		qsort_r(check.array, check.len, check.size, hsort_uint_cb, &check);
+
+	ret = hsort_check(&test, &check);
+
+	free(test.array);
+	free(check.array);
+	return ret;
+}

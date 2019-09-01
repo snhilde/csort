@@ -25,6 +25,78 @@ typedef struct hsort_merge_node {
 
 
 /* --- CALLBACKS --- */
+static hsort_equality_t hsort_qsort_signed_cb(const void *left, const void *right, void *thunk)
+{
+	hsort_data_t *data = thunk;
+	int64_t       a;
+	int64_t       b;
+
+	switch (data->size) {
+		case 1:
+			a = *(int8_t *)left;
+			b = *(int8_t *)right;
+			break;
+
+		case 2:
+			a = *(int16_t *)left;
+			b = *(int16_t *)right;
+			break;
+
+		case 4:
+			a = *(int32_t *)left;
+			b = *(int32_t *)right;
+			break;
+
+		case 8:
+			a = *(int64_t *)left;
+			b = *(int64_t *)right;
+			break;
+	}
+
+	if (a < b)
+		return (data->options & HSORT_ORDER_ASC) ? HSORT_LT : HSORT_GT;
+	else if (a > b)
+		return (data->options & HSORT_ORDER_ASC) ? HSORT_GT : HSORT_LT;
+
+	return HSORT_EQ;
+}
+
+static hsort_equality_t hsort_qsort_unsigned_cb(const void *left, const void *right, void *thunk)
+{
+	hsort_data_t *data = thunk;
+	u_int64_t     a;
+	u_int64_t     b;
+
+	switch (data->size) {
+		case 1:
+			a = *(u_int8_t *)left;
+			b = *(u_int8_t *)right;
+			break;
+
+		case 2:
+			a = *(u_int16_t *)left;
+			b = *(u_int16_t *)right;
+			break;
+
+		case 4:
+			a = *(u_int32_t *)left;
+			b = *(u_int32_t *)right;
+			break;
+
+		case 8:
+			a = *(u_int64_t *)left;
+			b = *(u_int64_t *)right;
+			break;
+	}
+
+	if (a < b)
+		return (data->options & HSORT_ORDER_ASC) ? HSORT_LT : HSORT_GT;
+	else if (a > b)
+		return (data->options & HSORT_ORDER_ASC) ? HSORT_GT : HSORT_LT;
+
+	return HSORT_EQ;
+}
+
 static hsort_equality_t hsort_signed_cb(const void *left, const void *right, void *thunk)
 {
 	hsort_data_t *data = thunk;
@@ -793,9 +865,9 @@ hsort_return_t hsort_test(size_t len, size_t size, bool is_signed, hsort_options
 
 	/* Sort check array. */
 	if (is_signed)
-		qsort_r(check.array, check.len, check.size, hsort_signed_cb, &check);
+		qsort_r(check.array, check.len, check.size, hsort_qsort_signed_cb, &check);
 	else
-		qsort_r(check.array, check.len, check.size, hsort_unsigned_cb, &check);
+		qsort_r(check.array, check.len, check.size, hsort_qsort_unsigned_cb, &check);
 
 	ret = hsort_check(&test, &check);
 

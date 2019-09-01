@@ -27,7 +27,7 @@ struct hsort_merge_node {
 /* --- CALLBACKS --- */
 static hsort_equality_t hsort_int_cb(const void *left, const void *right, void *thunk)
 {
-	hsort_data_t *data = *(hsort_data_t **)thunk;
+	hsort_data_t *data = thunk;
 	int64_t       a;
 	int64_t       b;
 
@@ -60,7 +60,7 @@ static hsort_equality_t hsort_int_cb(const void *left, const void *right, void *
 
 static hsort_equality_t hsort_uint_cb(const void *left, const void *right, void *thunk)
 {
-	hsort_data_t *data = *(hsort_data_t **)thunk;
+	hsort_data_t *data = thunk;
 	int64_t       a;
 	int64_t       b;
 
@@ -99,7 +99,7 @@ static hsort_equality_t hsort_uint_cb(const void *left, const void *right, void 
 
 static hsort_equality_t hsort_str_cb(const void *left, const void *right, void *thunk)
 {
-	hsort_data_t *data = *(hsort_data_t **)thunk;
+	hsort_data_t *data = thunk;
 	char          a    = *(char *)left;
 	char          b    = *(char *)right;
 
@@ -202,7 +202,7 @@ static void hsort_merge_subarrays(hsort_data_t *data, struct hsort_merge_node *t
 			left_array += data->size;
 			left_len--;
 
-		} else if (cb(left_array, right_array, &data) != HSORT_GT) {
+		} else if (cb(left_array, right_array, data) != HSORT_GT) {
 			/* Left value is less than or equal to right value. Move it to the array. */
 			hsort_swap(left_array, tmp_array, data->size);
 			left_array += data->size;
@@ -452,7 +452,7 @@ static hsort_return_t hsort_insertion(hsort_data_t *data, hsort_equality_cb cb)
 	end = data->array + (data->len * data->size);
 	for (selection = data->array + data->size; selection < end; selection += data->size) {
 		for (test = data->array; test < selection; test += data->size) {
-			if (cb(selection, test, &data) != HSORT_GT) {
+			if (cb(selection, test, data) != HSORT_GT) {
 				hsort_insert(test, selection, data->size);
 				break;
 			}
@@ -473,7 +473,7 @@ static hsort_return_t hsort_selection(hsort_data_t *data, hsort_equality_cb cb)
 	for (current = data->array; current < end - data->size; current += data->size) {
 		selection = current;
 		for (test = current + data->size; test < end; test += data->size) {
-			if (cb(selection, test, &data) == HSORT_GT)
+			if (cb(selection, test, data) == HSORT_GT)
 				selection = test;
 		}
 		if (selection != current)

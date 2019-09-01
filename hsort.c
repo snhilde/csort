@@ -776,6 +776,86 @@ static hsort_return_t hsort_sort_internal(hsort_data_t *data, hsort_equality_cb 
 }
 
 
+/* --- PUBLIC FUNCTIONS --- */
+void hsort_print_array(void *arr, size_t len, size_t size, bool is_signed)
+{
+	hsort_data_t data;
+
+	data.array     = arr;
+	data.len       = len;
+	data.size      = size;
+	data.is_signed = is_signed;
+
+	if (data.is_signed)
+		return hsort_print_int_array(&data);
+	return hsort_print_uint_array(&data);
+}
+
+void hsort_print_str(char *str)
+{
+	printf("%s\n", str);
+}
+
+hsort_return_t hsort_test(size_t len, size_t size, bool is_signed, hsort_options_t options)
+{
+	hsort_data_t   test;  /* Will contain the array that we will sort for the test */
+	hsort_data_t   check; /* Will contain the array that qsort will sort for a known-good check. */
+	hsort_return_t ret;
+
+	test.len        = len;
+	test.size       = size;
+	test.options    = options;
+	test.is_signed  = is_signed;
+
+	check.len       = len;
+	check.size      = size;
+	check.options   = options;
+	check.is_signed = is_signed;
+
+	if (hsort_random_array(&test) != HSORT_RET_SUCCESS)
+		return HSORT_RET_ERROR;
+
+	check.array = malloc(check.len * check.size);
+	if (check.array == NULL) {
+		free(test.array);
+		return HSORT_RET_ERROR;
+	}
+
+	memcpy(check.array, test.array, test.len * test.size);
+
+	if (options & HSORT_PRINT_BEFORE)
+		hsort_print_array(test.array, test.len, test.size, test.is_signed);
+
+	/* Sort test array. */
+	if (is_signed)
+		ret = hsort_sort_internal(&test, hsort_signed_cb);
+	else
+		ret = hsort_sort_internal(&test, hsort_unsigned_cb);
+
+	if (ret != HSORT_RET_SUCCESS) {
+		printf("Sorting error\n");
+		free(test.array);
+		free(check.array);
+		return ret;
+	}
+
+	if (options & HSORT_PRINT_AFTER)
+		hsort_print_array(test.array, test.len, test.size, test.is_signed);
+
+	/* Sort check array. */
+	if (is_signed)
+		qsort_r(check.array, check.len, check.size, hsort_qsort_signed_cb, &check);
+	else
+		qsort_r(check.array, check.len, check.size, hsort_qsort_unsigned_cb, &check);
+
+	ret = hsort_check(&test, &check);
+
+	free(test.array);
+	free(check.array);
+	return ret;
+}
+
+
 /* --- API WRAPPERS --- */
 hsort_return_t hsort_sort_int_array(void *arr, size_t len, size_t size, hsort_options_t options)
 {
@@ -863,83 +943,5 @@ hsort_return_t hsort_sort_custom(void *arr, size_t len, size_t size, bool is_sig
 	if (options & HSORT_PRINT_AFTER)
 		hsort_print_array(data.array, data.len, data.size, data.is_signed);
 
-	return ret;
-}
-
-void hsort_print_array(void *arr, size_t len, size_t size, bool is_signed)
-{
-	hsort_data_t data;
-
-	data.array     = arr;
-	data.len       = len;
-	data.size      = size;
-	data.is_signed = is_signed;
-
-	if (data.is_signed)
-		return hsort_print_int_array(&data);
-	return hsort_print_uint_array(&data);
-}
-
-void hsort_print_str(char *str)
-{
-	printf("%s\n", str);
-}
-
-hsort_return_t hsort_test(size_t len, size_t size, bool is_signed, hsort_options_t options)
-{
-	hsort_data_t   test;  /* Will contain the array that we will sort for the test */
-	hsort_data_t   check; /* Will contain the array that qsort will sort for a known-good check. */
-	hsort_return_t ret;
-
-	test.len        = len;
-	test.size       = size;
-	test.options    = options;
-	test.is_signed  = is_signed;
-
-	check.len       = len;
-	check.size      = size;
-	check.options   = options;
-	check.is_signed = is_signed;
-
-	if (hsort_random_array(&test) != HSORT_RET_SUCCESS)
-		return HSORT_RET_ERROR;
-
-	check.array = malloc(check.len * check.size);
-	if (check.array == NULL) {
-		free(test.array);
-		return HSORT_RET_ERROR;
-	}
-
-	memcpy(check.array, test.array, test.len * test.size);
-
-	if (options & HSORT_PRINT_BEFORE)
-		hsort_print_array(test.array, test.len, test.size, test.is_signed);
-
-	/* Sort test array. */
-	if (is_signed)
-		ret = hsort_sort_internal(&test, hsort_signed_cb);
-	else
-		ret = hsort_sort_internal(&test, hsort_unsigned_cb);
-
-	if (ret != HSORT_RET_SUCCESS) {
-		printf("Sorting error\n");
-		free(test.array);
-		free(check.array);
-		return ret;
-	}
-
-	if (options & HSORT_PRINT_AFTER)
-		hsort_print_array(test.array, test.len, test.size, test.is_signed);
-
-	/* Sort check array. */
-	if (is_signed)
-		qsort_r(check.array, check.len, check.size, hsort_qsort_signed_cb, &check);
-	else
-		qsort_r(check.array, check.len, check.size, hsort_qsort_unsigned_cb, &check);
-
-	ret = hsort_check(&test, &check);
-
-	free(test.array);
-	free(check.array);
 	return ret;
 }

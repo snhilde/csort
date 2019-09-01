@@ -3,9 +3,9 @@
 
 /* --- HELPER TYPES --- */
 enum hsort_merge_step {
-	HSORT_MERGE_NEW,
-	HSORT_MERGE_LEFT,
-	HSORT_MERGE_RIGHT,
+	HSORT_DESCEND_LEFT,
+	HSORT_DESCEND_RIGHT,
+	HSORT_MERGE_HALVES,
 };
 
 typedef struct hsort_data {
@@ -299,7 +299,7 @@ static hsort_merge_node_t *hsort_push(hsort_merge_node_t *top_node, void *array,
 
 	node = malloc(sizeof(*node));
 
-	node->next_step    = HSORT_MERGE_NEW;
+	node->next_step    = HSORT_DESCEND_LEFT;
 	node->data.array   = array;
 	node->data.len     = len;
 	node->data.size    = size;
@@ -579,26 +579,26 @@ static hsort_return_t hsort_merge(hsort_data_t *data, hsort_equality_cb cb)
 	top_node = hsort_push(top_node, data->array, data->len, data->size, data->options);
 
 	while (top_node != NULL) {
-		if (top_node->next_step == HSORT_MERGE_RIGHT) {
+		if (top_node->next_step == HSORT_MERGE_HALVES) {
 			/* Both halves are sorted. Merge them together. */
 			hsort_merge_subarrays(top_node, tmp_arr, cb);
 
 			/* Merge is done. Remove it from stack and keep going. */
 			top_node = hsort_pop(top_node);
 
-		} else if (top_node->next_step == HSORT_MERGE_LEFT) {
+		} else if (top_node->next_step == HSORT_DESCEND_RIGHT) {
 			/* Left half is done. Move to right half, using the smaller portion. */
 			tmp_len = top_node->data.len / 2;
 			if (tmp_len > 1)
 				top_node = hsort_push(top_node, top_node->data.array + ((top_node->data.len + 1)/2) * data->size, tmp_len, data->size, data->options);
-			top_node->next_step = HSORT_MERGE_RIGHT;
+			top_node->next_step = HSORT_MERGE_HALVES;
 
 		} else {
 			/* Start working on the left half, using the larger portion. */
 			tmp_len = (top_node->data.len + 1) / 2;
 			if (tmp_len > 1)
 				top_node = hsort_push(top_node, top_node->data.array, tmp_len, data->size, data->options);
-			top_node->next_step = HSORT_MERGE_LEFT;
+			top_node->next_step = HSORT_DESCEND_RIGHT;
 		}
 	}
 

@@ -61,8 +61,8 @@ static hsort_equality_t hsort_signed_cb(const void *left, const void *right, voi
 static hsort_equality_t hsort_unsigned_cb(const void *left, const void *right, void *thunk)
 {
 	hsort_data_t *data = thunk;
-	int64_t       a;
-	int64_t       b;
+	u_int64_t     a;
+	u_int64_t     b;
 
 	switch (data->size) {
 		case 1:

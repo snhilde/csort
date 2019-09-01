@@ -698,7 +698,7 @@ static hsort_return_t hsort_merge(hsort_data_t *data)
 /* --- COMMON FUNCTIONS --- */
 static void hsort_print_int_array(hsort_data_t *data)
 {
-	void         *arr = data->array;
+	void         *array = data->array;
 	unsigned int  i;
 
 	for (i = 0; i < data->len; i++) {
@@ -724,14 +724,14 @@ static void hsort_print_int_array(hsort_data_t *data)
 		}
 		if (i != data->len - 1)
 			printf(", ");
-		arr += data->size;
+		array += data->size;
 	}
 	printf("\n");
 }
 
 static void hsort_print_uint_array(hsort_data_t *data)
 {
-	void         *arr = data->array;
+	void         *array = data->array;
 	unsigned int  i;
 
 	for (i = 0; i < data->len; i++) {
@@ -757,7 +757,7 @@ static void hsort_print_uint_array(hsort_data_t *data)
 		}
 		if (i != data->len-1)
 			printf(", ");
-		arr += data->size;
+		array += data->size;
 	}
 	printf("\n");
 }

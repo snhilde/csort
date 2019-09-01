@@ -25,6 +25,7 @@ typedef struct hsort_data {
 /* --- CALLBACKS --- */
 static hsort_equality_t hsort_qsort_signed_cb(const void *left, const void *right, void *thunk)
 {
+	/* We have to use a special comparison callback for qsort to support sorting in descending order.*/
 	hsort_data_t *data = thunk;
 	int64_t       a;
 	int64_t       b;
@@ -61,6 +62,7 @@ static hsort_equality_t hsort_qsort_signed_cb(const void *left, const void *righ
 
 static hsort_equality_t hsort_qsort_unsigned_cb(const void *left, const void *right, void *thunk)
 {
+	/* We have to use a special comparison callback for qsort to support sorting in descending order.*/
 	hsort_data_t *data = thunk;
 	u_int64_t     a;
 	u_int64_t     b;
@@ -217,7 +219,7 @@ static void hsort_insert(void *left, void *right, size_t size)
 {
 	u_int64_t     tmp = 0;
 
-	/* Store value that we are moving down. */
+	/* Store value that we are moving. */
 	hsort_swap(right, &tmp, size);
 
 	/* Shift the value at each index one to the right. */
@@ -289,6 +291,8 @@ static void hsort_merge_subarrays(hsort_data_t *data, void *tmp_array)
 
 		tmp_array += data->size;
 	}
+
+	/* Put the now-sorted array back into place. */
 	memcpy(data->array, head, data->len * data->size);
 }
 
@@ -365,13 +369,13 @@ static u_int64_t hsort_random_num(hsort_data_t *data)
 	 * The second pseudo is because lrand48(), which produces values of uniform distribution,
 	 * coupled with basic statistics will yield more values with higher digit lengths than lower
 	 * digit lengths. This makes sense, because there are more numbers with a length of 8 digits
-	 * than there are numbers with a length 2 digits. To test the sorting function's ability to
+	 * than there are numbers with a length of 2 digits. To test the sorting function's ability to
 	 * sort values of all possible lengths, we want uniformity on value as well as digit length.
-	 * We're going to follow three steps to produce these pseudo-pseudo-random values:
+	 * We're going to follow four steps to produce these pseudo-pseudo-random values:
 	 * 1. Calculate a random digit length between 1 and the maximum length we can have.
 	 * 2. For each place, calculate a random digit between 0 and 9.
 	 * 3. Insert that digit in the appropriate place in the number.
-	 *
+	 * 4. Possibly negate the number.
 	 * Note: We don't care about overflow for our purposes.
 	 */
 	u_int64_t num = 0;
@@ -411,6 +415,7 @@ static hsort_return_t hsort_random_array(hsort_data_t *data)
 
 	pos = data->array;
 	for (i = 0; i < data->len; i++) {
+		/* Insert a random number in each position (index). */
 		switch (data->size) {
 			case 1:
 				if (data->is_signed)
@@ -448,6 +453,8 @@ static hsort_return_t hsort_random_array(hsort_data_t *data)
 
 static hsort_return_t hsort_check(hsort_data_t *data1, hsort_data_t *data2)
 {
+	/* Check with 2 arrays are equal for every index.
+ 	 */
 	void         *arr_a;
 	void         *arr_b;
 	unsigned int  i;
@@ -547,15 +554,20 @@ static void hsort_print_time(struct timespec *start_time, struct timespec *end_t
 /* --- SORTING ALGORITHMS --- */
 static hsort_return_t hsort_insertion(hsort_data_t *data)
 {
-	void *end;
-	void *selection;
-	void *test;
+	/* Starting with the second item in the array and iterating until the end, insert the item
+ 	 * in the preceding subarray at the position where the value before is less than (or greater than,
+	 * if sorting in descending order) the item's value and the value after is greater (is less).
+	 * E.g. item before < item < item after
+ 	 */
+	void *end;  /* Marker for the end of the array */
+	void *item; /* Current item being inserted into the preceding subarray */
+	void *test; /* Item being checked for equality comparison */
 
 	end = data->array + (data->len * data->size);
-	for (selection = data->array + data->size; selection < end; selection += data->size) {
-		for (test = data->array; test < selection; test += data->size) {
-			if (data->cb(selection, test, data) != (data->options & HSORT_ORDER_ASC ? HSORT_GT : HSORT_LT)) {
-				hsort_insert(test, selection, data->size);
+	for (item = data->array + data->size; item < end; item += data->size) {
+		for (test = data->array; test < item; test += data->size) {
+			if (data->cb(item, test, data) != (data->options & HSORT_ORDER_ASC ? HSORT_GT : HSORT_LT)) {
+				hsort_insert(test, item, data->size);
 				break;
 			}
 		}
@@ -566,10 +578,13 @@ static hsort_return_t hsort_insertion(hsort_data_t *data)
 
 static hsort_return_t hsort_selection(hsort_data_t *data)
 {
-	void *end;
-	void *current;
-	void *selection;
-	void *test;
+	/* Starting with the first item and iterating until one from the end, swap the current item
+ 	 * with the smallest (or largest, if sorting in descending order) item farther on in the array.
+ 	 */
+	void *end;       /* Marker for the end of the array */
+	void *current;   /* Current index */
+	void *selection; /* At any time, the lowest value found so far in the loop */
+	void *test;      /* Index being tested for possibly being smaller than the selection */
 
 	end = data->array + (data->len * data->size);
 	for (current = data->array; current < end - data->size; current += data->size) {
@@ -587,13 +602,15 @@ static hsort_return_t hsort_selection(hsort_data_t *data)
 
 static hsort_return_t hsort_merge_by_recursion(hsort_data_t *data, void *tmp_array)
 {
+	/* 1. Divide  - Halve array to the bottom (len = 1).
+ 	 * 2. Conquer - Sort lone item.
+	 * 3. Combine - Work backwards, combining arrays at each step.
+	 */
 	hsort_data_t data_left;
 	hsort_data_t data_right;
 
-	if (data == NULL || tmp_array == NULL)
-		return HSORT_RET_INVALIDUSE;
-
 	if (data->len == 1)
+		/* 2. Conquer: Sort lone item. */
 		return HSORT_RET_SUCCESS;
 
 	data_left.array      = data->array;
@@ -610,9 +627,11 @@ static hsort_return_t hsort_merge_by_recursion(hsort_data_t *data, void *tmp_arr
 	data_right.is_signed = data->is_signed;
 	data_right.cb        = data->cb;
 
+	/* 1. Divide: Recursively divide the array. */
 	hsort_merge_by_recursion(&data_left, tmp_array);
 	hsort_merge_by_recursion(&data_right, tmp_array);
 
+	/* 3. Combine: Merge back up. */
 	hsort_merge_subarrays(data, tmp_array);
 
 	return HSORT_RET_SUCCESS;
@@ -620,11 +639,12 @@ static hsort_return_t hsort_merge_by_recursion(hsort_data_t *data, void *tmp_arr
 
 static hsort_return_t hsort_merge_by_stack(hsort_data_t *data, void *tmp_array)
 {
+	/* 1. Divide  - Halve array to the bottom (len = 1).
+ 	 * 2. Conquer - Sort lone item. (Not shown in this implementation.)
+	 * 3. Combine - Work backwards, combining arrays at each step.
+	 */
 	hsort_data_t *top_node = NULL;
 	size_t        tmp_len;
-
-	if (data == NULL || tmp_array == NULL)
-		return HSORT_RET_INVALIDUSE;
 
 	top_node = hsort_merge_create_stack(data);
 	if (top_node == NULL)
@@ -632,21 +652,19 @@ static hsort_return_t hsort_merge_by_stack(hsort_data_t *data, void *tmp_array)
 
 	while (top_node != NULL) {
 		if (top_node->step == HSORT_MERGE_HALVES) {
-			/* Both halves are sorted. Merge them together. */
+			/* 3. Combine: Merge halves and move up a level. */
 			hsort_merge_subarrays(top_node, tmp_array);
-
-			/* Merge is done. Remove it from stack and keep going. */
 			top_node = hsort_pop(top_node);
 
 		} else if (top_node->step == HSORT_DESCEND_RIGHT) {
-			/* Left half is done. Move to right half, using the smaller portion. */
+			/* 1. Divide: Work down the right. */
 			top_node->step = HSORT_MERGE_HALVES;
 			tmp_len        = top_node-> len - top_node->len / 2;
 			if (tmp_len > 1)
 				top_node = hsort_push(top_node, top_node->array + ((top_node->len / 2) * top_node->size), tmp_len);
 
 		} else {
-			/* Start working on the left half. */
+			/* 1. Divide: Work down the left. */
 			top_node->step = HSORT_DESCEND_RIGHT;
 			tmp_len        = top_node->len / 2;
 			if (tmp_len > 1)
@@ -750,7 +768,7 @@ static hsort_return_t hsort_sort_internal(hsort_data_t *data)
 	struct timespec end_time   = {0};
 	hsort_return_t  ret;
 
-	if (data->array == NULL || data->len == 0 || data->size == 0 || data->options == 0 || data->cb == NULL)
+	if (data == NULL || data->array == NULL || data->len == 0 || data->size == 0 || data->options == 0 || data->cb == NULL)
 		return HSORT_RET_INVALIDUSE;
 
 	if (data->options & HSORT_ORDER_DESC)
@@ -804,7 +822,7 @@ void hsort_print_str(char *str)
 hsort_return_t hsort_test(size_t len, size_t size, bool is_signed, hsort_options_t options)
 {
 	hsort_data_t   test;  /* Will contain the array that we will sort for the test */
-	hsort_data_t   check; /* Will contain the array that qsort will sort for a known-good check. */
+	hsort_data_t   check; /* Will contain the array that qsort will sort for a known-good check */
 	hsort_return_t ret;
 
 	test.len        = len;
@@ -819,9 +837,11 @@ hsort_return_t hsort_test(size_t len, size_t size, bool is_signed, hsort_options
 	check.is_signed = is_signed;
 	check.cb        = is_signed ? hsort_signed_cb : hsort_unsigned_cb;
 
+	/* Build up an array of len items with random values of size size and signedness is_signed. */
 	if (hsort_random_array(&test) != HSORT_RET_SUCCESS)
 		return HSORT_RET_ERROR;
 
+	/* Duplicate array so qsort can sort it as well. */
 	check.array = malloc(check.len * check.size);
 	if (check.array == NULL) {
 		free(test.array);
@@ -854,6 +874,7 @@ hsort_return_t hsort_test(size_t len, size_t size, bool is_signed, hsort_options
 	else
 		qsort_r(check.array, check.len, check.size, hsort_qsort_unsigned_cb, &check);
 
+	/* See if arrays match or not. */
 	ret = hsort_check(&test, &check);
 
 	free(test.array);

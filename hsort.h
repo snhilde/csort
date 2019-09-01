@@ -43,12 +43,12 @@ typedef enum hsort_equality {
 
 typedef hsort_equality_t (*hsort_equality_cb)(const void *left, const void *right, void *size);
 
-hsort_return_t hsort_sort_int_array(void *arr, size_t len, size_t size, hsort_options_t options);
-hsort_return_t hsort_sort_uint_array(void *arr, size_t len, size_t size, hsort_options_t options);
+hsort_return_t hsort_sort_int_array(void *array, size_t len, size_t size, hsort_options_t options);
+hsort_return_t hsort_sort_uint_array(void *array, size_t len, size_t size, hsort_options_t options);
 hsort_return_t hsort_sort_str(char *str, hsort_options_t options);
-hsort_return_t hsort_sort_custom(void *arr, size_t len, size_t size, hsort_options_t options, bool is_signed, hsort_equality_cb cb);
+hsort_return_t hsort_sort_custom(void *array, size_t len, size_t size, hsort_options_t options, bool is_signed, hsort_equality_cb cb);
 
-void           hsort_print_array(void *arr, size_t len, size_t size, bool is_signed);
+void           hsort_print_array(void *array, size_t len, size_t size, bool is_signed);
 void           hsort_print_str(char *str);
 hsort_return_t hsort_test(size_t len, size_t size, bool is_signed, hsort_options_t options);
 

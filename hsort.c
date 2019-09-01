@@ -583,20 +583,21 @@ static hsort_return_t hsort_selection(hsort_data_t *data)
 	/* Starting with the first item and iterating until one from the end, swap the current item
  	 * with the smallest (or largest, if sorting in descending order) item farther on in the array.
  	 */
-	void *end;       /* Marker for the end of the array */
-	void *current;   /* Current index */
-	void *selection; /* At any time, the lowest value found so far in the loop */
-	void *test;      /* Index being tested for possibly being smaller than the selection */
+	unsigned int  i;       /* Current item, might be swapped out if a smaller (or larger) value is found */
+	unsigned int  j;       /* Item being compared against smallest (or largest) value found so far */
+	void         *i_ptr;   /* Array position for i */
+	void         *j_ptr;   /* Array position for j */
+	void         *min_ptr; /* Array position for smallest (or largest) value found so far */
 
-	end = data->array + (data->len * data->size);
-	for (current = data->array; current < end - data->size; current += data->size) {
-		selection = current;
-		for (test = current + data->size; test < end; test += data->size) {
-			if (data->cb(selection, test, data) == (data->options & HSORT_ORDER_ASC ? HSORT_GT : HSORT_LT))
-				selection = test;
+	for (i = 0; i < data->len - 1; i++) {
+		i_ptr   = data->array + (data->size * i);
+		min_ptr = i_ptr;
+		for (j = i + 1; j < data->len; j++) {
+			j_ptr = data->array + (data->size * j);
+			if (data->cb(j_ptr, min_ptr, data) == (data->options & HSORT_ORDER_ASC ? HSORT_LT : HSORT_GT))
+				min_ptr = j_ptr;
 		}
-		if (selection != current)
-			hsort_swap(current, selection, data->size);
+		hsort_swap(i_ptr, min_ptr, data->size);
 	}
 
 	return HSORT_RET_SUCCESS;

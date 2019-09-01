@@ -262,7 +262,7 @@ static void hsort_merge_subarrays(hsort_merge_node_t *top_node, void *tmp_array,
 	left_index  = top_node->data.array;
 	right_index = top_node->data.array + (left_len * top_node->data.size);
 
-	for (i = 0; i < left_len + right_len; i++) {
+	for (i = 0; i < top_node->data.len; i++) {
 		if (left_len == 0) {
 			/* Left side is done. Move over the right value. */
 			hsort_swap(right_index, tmp_array, top_node->data.size);

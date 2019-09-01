@@ -557,17 +557,19 @@ static hsort_return_t hsort_insertion(hsort_data_t *data)
 	/* Starting with the second item in the array and iterating until the end, insert the item
  	 * in the preceding subarray at the position where the value before is less than (or greater than,
 	 * if sorting in descending order) the item's value and the value after is greater (is less).
-	 * E.g. item before < item < item after
+	 * E.g. j < i < next item
  	 */
-	void *end;  /* Marker for the end of the array */
-	void *item; /* Current item being inserted into the preceding subarray */
-	void *test; /* Item being checked for equality comparison */
+	unsigned int  i;     /* Current item being inserted into the preceding subarray */
+	unsigned int  j;     /* Item being checked to determine insertion point for i */
+	void         *i_ptr; /* Array position for i */
+	void         *j_ptr; /* Array position for j */
 
-	end = data->array + (data->len * data->size);
-	for (item = data->array + data->size; item < end; item += data->size) {
-		for (test = data->array; test < item; test += data->size) {
-			if (data->cb(item, test, data) != (data->options & HSORT_ORDER_ASC ? HSORT_GT : HSORT_LT)) {
-				hsort_insert(test, item, data->size);
+	for (i = 1; i < data->len; i++) {
+		for (j = 0; j < i; j++) {
+			i_ptr = data->array + (data->size * i);
+			j_ptr = data->array + (data->size * j);
+			if (data->cb(i_ptr, j_ptr, data) == (data->options & HSORT_ORDER_ASC ? HSORT_LT : HSORT_GT)) {
+				hsort_insert(j_ptr, i_ptr, data->size);
 				break;
 			}
 		}

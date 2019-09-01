@@ -296,22 +296,22 @@ static void hsort_merge_subarrays(hsort_data_t *data, void *tmp_array)
 	memcpy(data->array, head, data->len * data->size);
 }
 
-static hsort_data_t *hsort_push(hsort_data_t *old_top, void *array, size_t len)
+static void hsort_add_level(hsort_data_t **level, void *array, size_t len)
 {
-	hsort_data_t *new_top;
+	hsort_data_t *new_level;
 
-	new_top = malloc(sizeof(*new_top));
+	new_level = malloc(sizeof(*new_level));
 
-	new_top->next      = old_top;
-	new_top->step      = HSORT_DESCEND_LEFT;
-	new_top->array     = array;
-	new_top->len       = len;
-	new_top->size      = old_top->size;
-	new_top->options   = old_top->options;
-	new_top->is_signed = old_top->is_signed;
-	new_top->cb        = old_top->cb;
+	new_level->next      = *level;
+	new_level->step      = HSORT_DESCEND_LEFT;
+	new_level->array     = array;
+	new_level->len       = len;
+	new_level->size      = (*level)->size;
+	new_level->options   = (*level)->options;
+	new_level->is_signed = (*level)->is_signed;
+	new_level->cb        = (*level)->cb;
 
-	return new_top;
+	(*level) = new_level;
 }
 
 static void hsort_finish_level(hsort_data_t **level)
@@ -661,14 +661,14 @@ static hsort_return_t hsort_merge_by_stack(hsort_data_t *data, void *tmp_array)
 			current_level->step = HSORT_MERGE_HALVES;
 			tmp_len             = current_level->len - current_level->len / 2;
 			if (tmp_len > 1)
-				current_level = hsort_push(current_level, current_level->array + ((current_level->len / 2) * current_level->size), tmp_len);
+				hsort_add_level(&current_level, current_level->array + ((current_level->len / 2) * current_level->size), tmp_len);
 
 		} else {
 			/* 1. Divide: Work down the left. */
 			current_level->step = HSORT_DESCEND_RIGHT;
 			tmp_len             = current_level->len / 2;
 			if (tmp_len > 1)
-				current_level = hsort_push(current_level, current_level->array, tmp_len);
+				hsort_add_level(&current_level, current_level->array, tmp_len);
 		}
 	}
 

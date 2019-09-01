@@ -1,4 +1,7 @@
-#include "tests.h"
+#include <stdio.h>
+#include <inttypes.h>
+
+#include "hsort.h"
 
 
 int main(int argc, char *argv[])

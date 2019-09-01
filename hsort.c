@@ -103,7 +103,7 @@ static hsort_equality_t hsort_str_cb(const void *left, const void *right, void *
 	char          a    = *(char *)left;
 	char          b    = *(char *)right;
 
-	(void)thunk;
+	(void)data;
 
 	if (a < b)
 		return HSORT_LT;

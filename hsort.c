@@ -651,10 +651,12 @@ static hsort_return_t hsort_merge_by_stack(hsort_data_t *data, void *tmp_array)
 		return HSORT_RET_ERROR;
 
 	while (current_level != NULL) {
-		if (current_level->next_step == HSORT_MERGE_HALVES) {
-			/* 3. Combine: Merge halves and move up a level. */
-			hsort_merge_subarrays(current_level, tmp_array);
-			hsort_finish_level(&current_level);
+		if (current_level->next_step == HSORT_DESCEND_LEFT) {
+			/* 1. Divide: Work down the left. */
+			current_level->next_step = HSORT_DESCEND_RIGHT;
+			tmp_len                  = current_level->len / 2;
+			if (tmp_len > 1)
+				hsort_add_level(&current_level, current_level->array, tmp_len);
 
 		} else if (current_level->next_step == HSORT_DESCEND_RIGHT) {
 			/* 1. Divide: Work down the right. */
@@ -664,11 +666,9 @@ static hsort_return_t hsort_merge_by_stack(hsort_data_t *data, void *tmp_array)
 				hsort_add_level(&current_level, current_level->array + ((current_level->len / 2) * current_level->size), tmp_len);
 
 		} else {
-			/* 1. Divide: Work down the left. */
-			current_level->next_step = HSORT_DESCEND_RIGHT;
-			tmp_len                  = current_level->len / 2;
-			if (tmp_len > 1)
-				hsort_add_level(&current_level, current_level->array, tmp_len);
+			/* 3. Combine: Merge halves and move up a level. */
+			hsort_merge_subarrays(current_level, tmp_array);
+			hsort_finish_level(&current_level);
 		}
 	}
 

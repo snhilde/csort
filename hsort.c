@@ -103,6 +103,8 @@ static hsort_equality_t hsort_str_cb(const void *left, const void *right, void *
 	char          a    = *(char *)left;
 	char          b    = *(char *)right;
 
+	(void)thunk;
+
 	if (a < b)
 		return HSORT_LT;
 	else if (a > b)
@@ -202,7 +204,7 @@ static void hsort_merge_subarrays(hsort_data_t *data, hsort_merge_node_t *top_no
 			left_array += data->size;
 			left_len--;
 
-		} else if (cb(left_array, right_array, data) != HSORT_GT) {
+		} else if (cb(left_array, right_array, data) != (data->options & HSORT_ORDER_ASC ? HSORT_GT : HSORT_LT)) {
 			/* Left value is less than or equal to right value. Move it to the array. */
 			hsort_swap(left_array, tmp_array, data->size);
 			left_array += data->size;
@@ -454,7 +456,7 @@ static hsort_return_t hsort_insertion(hsort_data_t *data, hsort_equality_cb cb)
 	end = data->array + (data->len * data->size);
 	for (selection = data->array + data->size; selection < end; selection += data->size) {
 		for (test = data->array; test < selection; test += data->size) {
-			if (cb(selection, test, data) != HSORT_GT) {
+			if (cb(selection, test, data) != (data->options & HSORT_ORDER_ASC ? HSORT_GT : HSORT_LT)) {
 				hsort_insert(test, selection, data->size);
 				break;
 			}
@@ -475,7 +477,7 @@ static hsort_return_t hsort_selection(hsort_data_t *data, hsort_equality_cb cb)
 	for (current = data->array; current < end - data->size; current += data->size) {
 		selection = current;
 		for (test = current + data->size; test < end; test += data->size) {
-			if (cb(selection, test, data) == HSORT_GT)
+			if (cb(selection, test, data) == (data->options & HSORT_ORDER_ASC ? HSORT_GT : HSORT_LT))
 				selection = test;
 		}
 		if (selection != current)

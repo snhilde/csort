@@ -762,7 +762,7 @@ static hsort_return_t hsort_sort_internal(hsort_data_t *data, hsort_equality_cb 
 		ret = hsort_insertion(data, cb);
 	else if (data->options & HSORT_SELECTION_SORT)
 		ret = hsort_selection(data, cb);
-	else if (data->options & HSORT_MERGE_SORT)
+	else if (data->options & (HSORT_MERGE_SORT|HSORT_MERGE_SORT_RECURSE))
 		ret = hsort_merge(data, cb);
 	else
 		return HSORT_RET_ERROR;

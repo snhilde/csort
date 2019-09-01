@@ -643,32 +643,32 @@ static hsort_return_t hsort_merge_by_stack(hsort_data_t *data, void *tmp_array)
  	 * 2. Conquer - Sort lone item. (Not shown in this implementation.)
 	 * 3. Combine - Work backwards, combining arrays at each step.
 	 */
-	hsort_data_t *top_node = NULL;
+	hsort_data_t *current_level = NULL;
 	size_t        tmp_len;
 
-	top_node = hsort_merge_create_stack(data);
-	if (top_node == NULL)
+	current_level = hsort_merge_create_stack(data);
+	if (current_level == NULL)
 		return HSORT_RET_ERROR;
 
-	while (top_node != NULL) {
-		if (top_node->step == HSORT_MERGE_HALVES) {
+	while (current_level != NULL) {
+		if (current_level->step == HSORT_MERGE_HALVES) {
 			/* 3. Combine: Merge halves and move up a level. */
-			hsort_merge_subarrays(top_node, tmp_array);
-			top_node = hsort_discard_top(top_node);
+			hsort_merge_subarrays(current_level, tmp_array);
+			current_level = hsort_discard_top(current_level);
 
-		} else if (top_node->step == HSORT_DESCEND_RIGHT) {
+		} else if (current_level->step == HSORT_DESCEND_RIGHT) {
 			/* 1. Divide: Work down the right. */
-			top_node->step = HSORT_MERGE_HALVES;
-			tmp_len        = top_node-> len - top_node->len / 2;
+			current_level->step = HSORT_MERGE_HALVES;
+			tmp_len        = current_level->len - current_level->len / 2;
 			if (tmp_len > 1)
-				top_node = hsort_push(top_node, top_node->array + ((top_node->len / 2) * top_node->size), tmp_len);
+				current_level = hsort_push(current_level, current_level->array + ((current_level->len / 2) * current_level->size), tmp_len);
 
 		} else {
 			/* 1. Divide: Work down the left. */
-			top_node->step = HSORT_DESCEND_RIGHT;
-			tmp_len        = top_node->len / 2;
+			current_level->step = HSORT_DESCEND_RIGHT;
+			tmp_len        = current_level->len / 2;
 			if (tmp_len > 1)
-				top_node = hsort_push(top_node, top_node->array, tmp_len);
+				current_level = hsort_push(current_level, current_level->array, tmp_len);
 		}
 	}
 

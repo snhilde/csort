@@ -18,8 +18,7 @@ typedef struct hsort_data {
 
 typedef struct hsort_merge_node {
 	struct hsort_merge_node *next;
-	void                    *array;
-	size_t                   len;
+	hsort_data_t             data;
 	enum hsort_merge_step    step;
 } hsort_merge_node_t;
 

@@ -296,6 +296,10 @@ static u_int64_t hsort_random_num(hsort_data_t *data)
 		num += (u_int64_t)pow(10, i) * digit;
 	}
 
+	/* Possibly negate it. */
+	if (lrand48() % 2)
+		num *= -1;
+
 	return num;
 }
 

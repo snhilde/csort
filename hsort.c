@@ -25,7 +25,7 @@ struct hsort_merge_node {
 
 
 /* --- CALLBACKS --- */
-static hsort_equality_t hsort_int_cb(const void *left, const void *right, void *thunk)
+static hsort_equality_t hsort_signed_cb(const void *left, const void *right, void *thunk)
 {
 	hsort_data_t *data = thunk;
 	int64_t       a;
@@ -645,7 +645,7 @@ hsort_return_t hsort_sort_int_array(void *arr, size_t len, size_t size, hsort_op
 	if (options & HSORT_PRINT_BEFORE)
 		hsort_print_array(data.array, data.len, data.size, data.is_signed);
 
-	ret = hsort_sort_internal(&data, hsort_int_cb);
+	ret = hsort_sort_internal(&data, hsort_signed_cb);
 
 	if (options & HSORT_PRINT_AFTER)
 		hsort_print_array(data.array, data.len, data.size, data.is_signed);
@@ -771,7 +771,7 @@ hsort_return_t hsort_test(size_t len, size_t size, bool is_signed, hsort_options
 
 	/* Sort test array. */
 	if (is_signed)
-		ret = hsort_sort_internal(&test, hsort_int_cb);
+		ret = hsort_sort_internal(&test, hsort_signed_cb);
 	else
 		ret = hsort_sort_internal(&test, hsort_uint_cb);
 
@@ -787,7 +787,7 @@ hsort_return_t hsort_test(size_t len, size_t size, bool is_signed, hsort_options
 
 	/* Sort check array. */
 	if (is_signed)
-		qsort_r(check.array, check.len, check.size, hsort_int_cb, &check);
+		qsort_r(check.array, check.len, check.size, hsort_signed_cb, &check);
 	else
 		qsort_r(check.array, check.len, check.size, hsort_uint_cb, &check);
 

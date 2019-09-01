@@ -704,19 +704,19 @@ static void hsort_print_int_array(hsort_data_t *data)
 	for (i = 0; i < data->len; i++) {
 		switch (data->size) {
 			case 1:
-				printf("%" PRId8, *(int8_t *)arr);
+				printf("%" PRId8, *(int8_t *)array);
 				break;
 
 			case 2:
-				printf("%" PRId16, *(int16_t *)arr);
+				printf("%" PRId16, *(int16_t *)array);
 				break;
 
 			case 4:
-				printf("%" PRId32, *(int32_t *)arr);
+				printf("%" PRId32, *(int32_t *)array);
 				break;
 
 			case 8:
-				printf("%" PRId64, *(int64_t *)arr);
+				printf("%" PRId64, *(int64_t *)array);
 				break;
 
 			default:
@@ -737,19 +737,19 @@ static void hsort_print_uint_array(hsort_data_t *data)
 	for (i = 0; i < data->len; i++) {
 		switch (data->size) {
 			case 1:
-				printf("%" PRIu8, *(u_int8_t *)arr);
+				printf("%" PRIu8, *(u_int8_t *)array);
 				break;
 
 			case 2:
-				printf("%" PRIu16, *(u_int16_t *)arr);
+				printf("%" PRIu16, *(u_int16_t *)array);
 				break;
 
 			case 4:
-				printf("%" PRIu32, *(u_int32_t *)arr);
+				printf("%" PRIu32, *(u_int32_t *)array);
 				break;
 
 			case 8:
-				printf("%" PRIu64, *(u_int64_t *)arr);
+				printf("%" PRIu64, *(u_int64_t *)array);
 				break;
 
 			default:
@@ -800,11 +800,11 @@ static hsort_return_t hsort_sort_internal(hsort_data_t *data)
 
 
 /* --- PUBLIC FUNCTIONS --- */
-void hsort_print_array(void *arr, size_t len, size_t size, bool is_signed)
+void hsort_print_array(void *array, size_t len, size_t size, bool is_signed)
 {
 	hsort_data_t data;
 
-	data.array     = arr;
+	data.array     = array;
 	data.len       = len;
 	data.size      = size;
 	data.is_signed = is_signed;
@@ -884,12 +884,12 @@ hsort_return_t hsort_test(size_t len, size_t size, bool is_signed, hsort_options
 
 
 /* --- API WRAPPERS --- */
-hsort_return_t hsort_sort_int_array(void *arr, size_t len, size_t size, hsort_options_t options)
+hsort_return_t hsort_sort_int_array(void *array, size_t len, size_t size, hsort_options_t options)
 {
 	hsort_data_t   data;
 	hsort_return_t ret;
 
-	data.array     = arr;
+	data.array     = array;
 	data.len       = len;
 	data.size      = size;
 	data.options   = options;
@@ -908,12 +908,12 @@ hsort_return_t hsort_sort_int_array(void *arr, size_t len, size_t size, hsort_op
 
 }
 
-hsort_return_t hsort_sort_uint_array(void *arr, size_t len, size_t size, hsort_options_t options)
+hsort_return_t hsort_sort_uint_array(void *array, size_t len, size_t size, hsort_options_t options)
 {
 	hsort_data_t   data;
 	hsort_return_t ret;
 
-	data.array     = arr;
+	data.array     = array;
 	data.len       = len;
 	data.size      = size;
 	data.options   = options;
@@ -954,12 +954,12 @@ hsort_return_t hsort_sort_str(char *str, hsort_options_t options)
 	return ret;
 }
 
-hsort_return_t hsort_sort_custom(void *arr, size_t len, size_t size, hsort_options_t options, bool is_signed, hsort_equality_cb cb)
+hsort_return_t hsort_sort_custom(void *array, size_t len, size_t size, hsort_options_t options, bool is_signed, hsort_equality_cb cb)
 {
 	hsort_data_t   data;
 	hsort_return_t ret;
 
-	data.array     = arr;
+	data.array     = array;
 	data.len       = len;
 	data.size      = size;
 	data.options   = options;

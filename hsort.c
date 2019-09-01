@@ -14,6 +14,7 @@ typedef struct hsort_data {
 	size_t                 size;
 	hsort_options_t        options;
 	bool                   is_signed;
+	hsort_equality_cb      cb;
 
 	/* For merge sort only */
 	struct hsort_data     *next;
@@ -242,7 +243,7 @@ static void hsort_insert(void *left, void *right, size_t size)
 	hsort_swap(right, &tmp, size);
 }
 
-static void hsort_merge_subarrays(hsort_data_t *top_node, void *tmp_array, hsort_equality_cb cb)
+static void hsort_merge_subarrays(hsort_data_t *top_node, void *tmp_array)
 {
 	void   *head;
 	size_t  left_len;
@@ -273,7 +274,7 @@ static void hsort_merge_subarrays(hsort_data_t *top_node, void *tmp_array, hsort
 			left_index += top_node->size;
 			left_len--;
 
-		} else if (cb(left_index, right_index, top_node) != (top_node->options & HSORT_ORDER_ASC ? HSORT_GT : HSORT_LT)) {
+		} else if (top_node->cb(left_index, right_index, top_node) != (top_node->options & HSORT_ORDER_ASC ? HSORT_GT : HSORT_LT)) {
 			/* Left value is less than or equal to right value. Move it to the array. */
 			hsort_swap(left_index, tmp_array, top_node->size);
 			left_index += top_node->size;
@@ -304,6 +305,7 @@ static hsort_data_t *hsort_push(hsort_data_t *old_top, void *array, size_t len)
 	new_top->size      = old_top->size;
 	new_top->options   = old_top->options;
 	new_top->is_signed = old_top->is_signed;
+	new_top->cb        = old_top->cb;
 
 	return new_top;
 }
@@ -333,6 +335,7 @@ static hsort_data_t *hsort_merge_create_stack(hsort_data_t *data)
 	top_node->size      = data->size;
 	top_node->options   = data->options;
 	top_node->is_signed = data->is_signed;
+	top_node->cb        = data->cb;
 
 	return top_node;
 }
@@ -542,7 +545,7 @@ static void hsort_print_time(struct timespec *start_time, struct timespec *end_t
 
 
 /* --- SORTING ALGORITHMS --- */
-static hsort_return_t hsort_insertion(hsort_data_t *data, hsort_equality_cb cb)
+static hsort_return_t hsort_insertion(hsort_data_t *data)
 {
 	void *end;
 	void *selection;
@@ -551,7 +554,7 @@ static hsort_return_t hsort_insertion(hsort_data_t *data, hsort_equality_cb cb)
 	end = data->array + (data->len * data->size);
 	for (selection = data->array + data->size; selection < end; selection += data->size) {
 		for (test = data->array; test < selection; test += data->size) {
-			if (cb(selection, test, data) != (data->options & HSORT_ORDER_ASC ? HSORT_GT : HSORT_LT)) {
+			if (data->cb(selection, test, data) != (data->options & HSORT_ORDER_ASC ? HSORT_GT : HSORT_LT)) {
 				hsort_insert(test, selection, data->size);
 				break;
 			}
@@ -561,7 +564,7 @@ static hsort_return_t hsort_insertion(hsort_data_t *data, hsort_equality_cb cb)
 	return HSORT_RET_SUCCESS;
 }
 
-static hsort_return_t hsort_selection(hsort_data_t *data, hsort_equality_cb cb)
+static hsort_return_t hsort_selection(hsort_data_t *data)
 {
 	void *end;
 	void *current;
@@ -572,7 +575,7 @@ static hsort_return_t hsort_selection(hsort_data_t *data, hsort_equality_cb cb)
 	for (current = data->array; current < end - data->size; current += data->size) {
 		selection = current;
 		for (test = current + data->size; test < end; test += data->size) {
-			if (cb(selection, test, data) == (data->options & HSORT_ORDER_ASC ? HSORT_GT : HSORT_LT))
+			if (data->cb(selection, test, data) == (data->options & HSORT_ORDER_ASC ? HSORT_GT : HSORT_LT))
 				selection = test;
 		}
 		if (selection != current)
@@ -582,12 +585,12 @@ static hsort_return_t hsort_selection(hsort_data_t *data, hsort_equality_cb cb)
 	return HSORT_RET_SUCCESS;
 }
 
-static hsort_return_t hsort_merge_by_recursion(hsort_data_t *data, void *tmp_array, hsort_equality_cb cb)
+static hsort_return_t hsort_merge_by_recursion(hsort_data_t *data, void *tmp_array)
 {
 	hsort_data_t data_left;
 	hsort_data_t data_right;
 
-	if (data == NULL || tmp_array == NULL || cb == NULL)
+	if (data == NULL || tmp_array == NULL)
 		return HSORT_RET_INVALIDUSE;
 
 	if (data->len == 1)
@@ -598,27 +601,29 @@ static hsort_return_t hsort_merge_by_recursion(hsort_data_t *data, void *tmp_arr
 	data_left.size       = data->size;
 	data_left.options    = data->options;
 	data_left.is_signed  = data->is_signed;
+	data_left.cb         = data->cb;
 
 	data_right.array     = data->array + (data_left.len * data->size);
 	data_right.len       = data->len - data->len / 2;
 	data_right.size      = data->size;
 	data_right.options   = data->options;
 	data_right.is_signed = data->is_signed;
+	data_right.cb        = data->cb;
 
-	hsort_merge_by_recursion(&data_left, tmp_array, cb);
-	hsort_merge_by_recursion(&data_right, tmp_array, cb);
+	hsort_merge_by_recursion(&data_left, tmp_array);
+	hsort_merge_by_recursion(&data_right, tmp_array);
 
-	hsort_merge_subarrays(data, tmp_array, cb);
+	hsort_merge_subarrays(data, tmp_array);
 
 	return HSORT_RET_SUCCESS;
 }
 
-static hsort_return_t hsort_merge_by_stack(hsort_data_t *data, void *tmp_array, hsort_equality_cb cb)
+static hsort_return_t hsort_merge_by_stack(hsort_data_t *data, void *tmp_array)
 {
 	hsort_data_t *top_node = NULL;
 	size_t        tmp_len;
 
-	if (data == NULL || tmp_array == NULL || cb == NULL)
+	if (data == NULL || tmp_array == NULL)
 		return HSORT_RET_INVALIDUSE;
 
 	top_node = hsort_merge_create_stack(data);
@@ -628,7 +633,7 @@ static hsort_return_t hsort_merge_by_stack(hsort_data_t *data, void *tmp_array, 
 	while (top_node != NULL) {
 		if (top_node->step == HSORT_MERGE_HALVES) {
 			/* Both halves are sorted. Merge them together. */
-			hsort_merge_subarrays(top_node, tmp_array, cb);
+			hsort_merge_subarrays(top_node, tmp_array);
 
 			/* Merge is done. Remove it from stack and keep going. */
 			top_node = hsort_pop(top_node);
@@ -652,7 +657,7 @@ static hsort_return_t hsort_merge_by_stack(hsort_data_t *data, void *tmp_array, 
 	return HSORT_RET_SUCCESS;
 }
 
-static hsort_return_t hsort_merge(hsort_data_t *data, hsort_equality_cb cb)
+static hsort_return_t hsort_merge(hsort_data_t *data)
 {
 	void           *tmp_array;
 	hsort_return_t  ret;
@@ -662,9 +667,9 @@ static hsort_return_t hsort_merge(hsort_data_t *data, hsort_equality_cb cb)
 		return HSORT_RET_ERROR;
 
 	if (data->options & HSORT_MERGE_SORT_RECURSE) {
-		ret = hsort_merge_by_recursion(data, tmp_array, cb);
+		ret = hsort_merge_by_recursion(data, tmp_array);
 	} else {
-		ret = hsort_merge_by_stack(data, tmp_array, cb);
+		ret = hsort_merge_by_stack(data, tmp_array);
 	}
 
 	free(tmp_array);
@@ -739,13 +744,13 @@ static void hsort_print_uint_array(hsort_data_t *data)
 	printf("\n");
 }
 
-static hsort_return_t hsort_sort_internal(hsort_data_t *data, hsort_equality_cb cb)
+static hsort_return_t hsort_sort_internal(hsort_data_t *data)
 {
 	struct timespec start_time = {0};
 	struct timespec end_time   = {0};
 	hsort_return_t  ret;
 
-	if (data->array == NULL || data->len == 0 || data->size == 0 || data->options == 0 || cb == NULL)
+	if (data->array == NULL || data->len == 0 || data->size == 0 || data->options == 0 || data->cb == NULL)
 		return HSORT_RET_INVALIDUSE;
 
 	if (data->options & HSORT_PRINT_TIME)
@@ -759,11 +764,11 @@ static hsort_return_t hsort_sort_internal(hsort_data_t *data, hsort_equality_cb 
 		data->options |= HSORT_ORDER_ASC;
 
 	if (data->options & HSORT_INSERTION_SORT)
-		ret = hsort_insertion(data, cb);
+		ret = hsort_insertion(data);
 	else if (data->options & HSORT_SELECTION_SORT)
-		ret = hsort_selection(data, cb);
+		ret = hsort_selection(data);
 	else if (data->options & (HSORT_MERGE_SORT|HSORT_MERGE_SORT_RECURSE))
-		ret = hsort_merge(data, cb);
+		ret = hsort_merge(data);
 	else
 		return HSORT_RET_ERROR;
 
@@ -806,11 +811,13 @@ hsort_return_t hsort_test(size_t len, size_t size, bool is_signed, hsort_options
 	test.size       = size;
 	test.options    = options;
 	test.is_signed  = is_signed;
+	test.cb         = is_signed ? hsort_signed_cb : hsort_unsigned_cb;
 
 	check.len       = len;
 	check.size      = size;
 	check.options   = options;
 	check.is_signed = is_signed;
+	check.cb        = is_signed ? hsort_signed_cb : hsort_unsigned_cb;
 
 	if (hsort_random_array(&test) != HSORT_RET_SUCCESS)
 		return HSORT_RET_ERROR;
@@ -820,7 +827,6 @@ hsort_return_t hsort_test(size_t len, size_t size, bool is_signed, hsort_options
 		free(test.array);
 		return HSORT_RET_ERROR;
 	}
-
 	memcpy(check.array, test.array, test.len * test.size);
 
 	if (options & HSORT_PRINT_BEFORE)
@@ -828,9 +834,9 @@ hsort_return_t hsort_test(size_t len, size_t size, bool is_signed, hsort_options
 
 	/* Sort test array. */
 	if (is_signed)
-		ret = hsort_sort_internal(&test, hsort_signed_cb);
+		ret = hsort_sort_internal(&test);
 	else
-		ret = hsort_sort_internal(&test, hsort_unsigned_cb);
+		ret = hsort_sort_internal(&test);
 
 	if (ret != HSORT_RET_SUCCESS) {
 		printf("Sorting error\n");
@@ -867,11 +873,12 @@ hsort_return_t hsort_sort_int_array(void *arr, size_t len, size_t size, hsort_op
 	data.size      = size;
 	data.options   = options;
 	data.is_signed = true;
+	data.cb        = hsort_signed_cb;
 
 	if (options & HSORT_PRINT_BEFORE)
 		hsort_print_array(data.array, data.len, data.size, data.is_signed);
 
-	ret = hsort_sort_internal(&data, hsort_signed_cb);
+	ret = hsort_sort_internal(&data);
 
 	if (options & HSORT_PRINT_AFTER)
 		hsort_print_array(data.array, data.len, data.size, data.is_signed);
@@ -890,11 +897,12 @@ hsort_return_t hsort_sort_uint_array(void *arr, size_t len, size_t size, hsort_o
 	data.size      = size;
 	data.options   = options;
 	data.is_signed = false;
+	data.cb        = hsort_unsigned_cb;
 
 	if (options & HSORT_PRINT_BEFORE)
 		hsort_print_array(data.array, data.len, data.size, data.is_signed);
 
-	ret = hsort_sort_internal(&data, hsort_unsigned_cb);
+	ret = hsort_sort_internal(&data);
 
 	if (options & HSORT_PRINT_AFTER)
 		hsort_print_array(data.array, data.len, data.size, data.is_signed);
@@ -912,11 +920,12 @@ hsort_return_t hsort_sort_str(char *str, hsort_options_t options)
 	data.size      = sizeof(*str);
 	data.options   = options;
 	data.is_signed = true;
+	data.cb        = hsort_str_cb;
 
 	if (options & HSORT_PRINT_BEFORE)
 		hsort_print_str(str);
 
-	ret = hsort_sort_internal(&data, hsort_str_cb);
+	ret = hsort_sort_internal(&data);
 
 	if (options & HSORT_PRINT_AFTER)
 		hsort_print_str(str);
@@ -934,11 +943,12 @@ hsort_return_t hsort_sort_custom(void *arr, size_t len, size_t size, bool is_sig
 	data.size      = size;
 	data.options   = options;
 	data.is_signed = is_signed;
+	data.cb        = cb;
 
 	if (options & HSORT_PRINT_BEFORE)
 		hsort_print_array(data.array, data.len, data.size, data.is_signed);
 
-	ret = hsort_sort_internal(&data, cb);
+	ret = hsort_sort_internal(&data);
 
 	if (options & HSORT_PRINT_AFTER)
 		hsort_print_array(data.array, data.len, data.size, data.is_signed);

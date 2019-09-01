@@ -187,7 +187,7 @@ static hsort_equality_t hsort_str_cb(const void *left, const void *right, void *
 
 
 /* --- MERGE SORT HELPER FUNCTIONS --- */
-static void hsort_merge_subarrays(hsort_data_t *data, void *tmp_array)
+static void hsort_merge_combine(hsort_data_t *data, void *tmp_array)
 {
 	size_t  left_len;
 	size_t  right_len;
@@ -382,7 +382,7 @@ static hsort_return_t hsort_merge_by_recursion(hsort_data_t *data, void *tmp_arr
 	hsort_merge_by_recursion(&data_right, tmp_array);
 
 	/* 3. Combine: Merge back up. */
-	hsort_merge_subarrays(data, tmp_array);
+	hsort_merge_combine(data, tmp_array);
 
 	return HSORT_RET_SUCCESS;
 }
@@ -417,7 +417,7 @@ static hsort_return_t hsort_merge_by_stack(hsort_data_t *data, void *tmp_array)
 
 		} else {
 			/* 3. Combine: Merge halves and move up a level. */
-			hsort_merge_subarrays(current_level, tmp_array);
+			hsort_merge_combine(current_level, tmp_array);
 			hsort_merge_finish_level(&current_level);
 		}
 	}

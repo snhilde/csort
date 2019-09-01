@@ -314,7 +314,7 @@ static hsort_data_t *hsort_push(hsort_data_t *old_top, void *array, size_t len)
 	return new_top;
 }
 
-static hsort_data_t *hsort_pop(hsort_data_t *old_top)
+static hsort_data_t *hsort_discard_top(hsort_data_t *old_top)
 {
 	hsort_data_t *new_top;
 
@@ -654,7 +654,7 @@ static hsort_return_t hsort_merge_by_stack(hsort_data_t *data, void *tmp_array)
 		if (top_node->step == HSORT_MERGE_HALVES) {
 			/* 3. Combine: Merge halves and move up a level. */
 			hsort_merge_subarrays(top_node, tmp_array);
-			top_node = hsort_pop(top_node);
+			top_node = hsort_discard_top(top_node);
 
 		} else if (top_node->step == HSORT_DESCEND_RIGHT) {
 			/* 1. Divide: Work down the right. */

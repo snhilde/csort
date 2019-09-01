@@ -309,14 +309,16 @@ static hsort_merge_node_t *hsort_push(hsort_merge_node_t *top_node, void *array,
 	return node;
 }
 
-static void hsort_pop(hsort_merge_node_t **top_node)
+static hsort_merge_node_t *hsort_pop(hsort_merge_node_t *top_node)
 {
 	hsort_merge_node_t *node;
+	hsort_merge_node_t *next;
 
-	node      = *top_node;
-	*top_node = (*top_node)->next;
+	node = top_node;
+	next = top_node->next;
 
 	free(node);
+	return next;
 }
 
 static int hsort_max_length(hsort_data_t *data)
@@ -582,7 +584,7 @@ static hsort_return_t hsort_merge(hsort_data_t *data, hsort_equality_cb cb)
 			hsort_merge_subarrays(top_node, tmp_arr, cb);
 
 			/* Merge is done. Remove it from stack and keep going. */
-			hsort_pop(&top_node);
+			top_node = hsort_pop(top_node);
 
 		} else if (top_node->step == HSORT_MERGE_LEFT) {
 			/* Left half is done. Move to right half, using the smaller portion. */

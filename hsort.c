@@ -288,6 +288,13 @@ static hsort_return_t hsort_insertion(hsort_data_t *data)
  	 * in the preceding subarray at the position where the value before is less than (or greater than,
 	 * if sorting in descending order) the item's value and the value after is greater (is less).
 	 * E.g. j < i < next item
+	 *
+	 * Loop invariant:
+	 *   Initialization: The first value is sorted by default and untouched.
+	 *   Maintenance:    Each insertion moves one value into sorted order, keeping the sort.
+	 *   Termination:    After the main loop finishes, the sorted subarray (the subarray that was
+	 *                   on the left) will have grown to be the entire array, leaving the main
+	 *                   array in sorted array.
  	 */
 	unsigned int  i;     /* Current item being inserted into the preceding subarray */
 	unsigned int  j;     /* Item being checked to determine insertion point for i */
@@ -324,6 +331,15 @@ static hsort_return_t hsort_selection(hsort_data_t *data)
 {
 	/* Starting with the first item and iterating until one from the end, swap the current item
  	 * with the smallest (or largest, if sorting in descending order) item farther on in the array.
+	 *
+	 * Loop invariant:
+	 *   Initialization: The sorted subarray has a length of zero in the beginning.
+	 *   Maintenance:    Before each loop, there can't be any value in the unsorted subarray that
+	 *                   is smaller than any value in the sorted subarray. Whatever is added next
+	 *                   is guaranteed to be larger than any value in the sorted subarray. The next value
+	 *                   is tacked on at the end of the sorted subarray. Therefore, the last value in the
+	 *                   sorted subarray after each loop will be greater than every value before it.
+	 *   Termination:    This continues until every value naturally falls into sorted order.
  	 */
 	unsigned int  i;       /* Current item, might be swapped out if a smaller (or larger) value is found */
 	unsigned int  j;       /* Item being compared against smallest (or largest) value found so far */
@@ -355,6 +371,13 @@ static hsort_return_t hsort_merge_by_recursion(hsort_data_t *data, void *tmp_arr
 	/* 1. Divide  - Halve array to the bottom (len = 1).
  	 * 2. Conquer - Sort lone item.
 	 * 3. Combine - Work backwards, combining arrays at each step.
+	 *
+	 * Loop invariant: (same as merge sort by stack)
+	 *   Initialization: Each array is divided into subarrays until the length is one and
+	 *                   therefore sorted from the beginning.
+	 *   Maintenance:    Each sorted subarray is merged with another sorted subarray to build
+	 *                   an even larger sorted subarray.
+	 *   Termination:    After all the merges are complete, the array will be in sorted order.
 	 */
 	hsort_data_t data_left;
 	hsort_data_t data_right;
@@ -392,6 +415,13 @@ static hsort_return_t hsort_merge_by_stack(hsort_data_t *data, void *tmp_array)
 	/* 1. Divide  - Halve array to the bottom (len = 1).
  	 * 2. Conquer - Sort lone item. (Not shown in this implementation.)
 	 * 3. Combine - Work backwards, combining arrays at each step.
+	 *
+	 * Loop invariant: (same as merge sort by recursion)
+	 *   Initialization: Each array is divided into subarrays until the length is one and
+	 *                   therefore sorted from the beginning.
+	 *   Maintenance:    Each sorted subarray is merged with another sorted subarray to build
+	 *                   an even larger sorted subarray.
+	 *   Termination:    After all the merges are complete, the array will be in sorted order.
 	 */
 	hsort_data_t *current_level = NULL;
 	size_t        tmp_len;

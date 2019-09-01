@@ -18,7 +18,7 @@ typedef struct hsort_data {
 
 	/* For merge sort only */
 	struct hsort_data     *next;
-	enum hsort_merge_step  step;
+	enum hsort_merge_step  next_step;
 } hsort_data_t;
 
 
@@ -303,7 +303,7 @@ static void hsort_add_level(hsort_data_t **level, void *array, size_t len)
 	new_level = malloc(sizeof(*new_level));
 
 	new_level->next      = *level;
-	new_level->step      = HSORT_DESCEND_LEFT;
+	new_level->next_step = HSORT_DESCEND_LEFT;
 	new_level->array     = array;
 	new_level->len       = len;
 	new_level->size      = (*level)->size;
@@ -333,7 +333,7 @@ static hsort_data_t *hsort_merge_create_stack(hsort_data_t *data)
 		return NULL;
 
 	top_node->next      = NULL;
-	top_node->step      = HSORT_DESCEND_LEFT;
+	top_node->next_step = HSORT_DESCEND_LEFT;
 	top_node->array     = data->array;
 	top_node->len       = data->len;
 	top_node->size      = data->size;
@@ -651,22 +651,22 @@ static hsort_return_t hsort_merge_by_stack(hsort_data_t *data, void *tmp_array)
 		return HSORT_RET_ERROR;
 
 	while (current_level != NULL) {
-		if (current_level->step == HSORT_MERGE_HALVES) {
+		if (current_level->next_step == HSORT_MERGE_HALVES) {
 			/* 3. Combine: Merge halves and move up a level. */
 			hsort_merge_subarrays(current_level, tmp_array);
 			hsort_finish_level(&current_level);
 
-		} else if (current_level->step == HSORT_DESCEND_RIGHT) {
+		} else if (current_level->next_step == HSORT_DESCEND_RIGHT) {
 			/* 1. Divide: Work down the right. */
-			current_level->step = HSORT_MERGE_HALVES;
-			tmp_len             = current_level->len - current_level->len / 2;
+			current_level->next_step = HSORT_MERGE_HALVES;
+			tmp_len                  = current_level->len - current_level->len / 2;
 			if (tmp_len > 1)
 				hsort_add_level(&current_level, current_level->array + ((current_level->len / 2) * current_level->size), tmp_len);
 
 		} else {
 			/* 1. Divide: Work down the left. */
-			current_level->step = HSORT_DESCEND_RIGHT;
-			tmp_len             = current_level->len / 2;
+			current_level->next_step = HSORT_DESCEND_RIGHT;
+			tmp_len                  = current_level->len / 2;
 			if (tmp_len > 1)
 				hsort_add_level(&current_level, current_level->array, tmp_len);
 		}

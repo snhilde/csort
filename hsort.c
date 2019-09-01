@@ -293,7 +293,7 @@ static void hsort_merge_subarrays(hsort_merge_node_t *top_node, void *tmp_array,
 	memcpy(top_node->data.array, head, top_node->data.len * top_node->data.size);
 }
 
-static void hsort_push(hsort_merge_node_t **top_node, void *array, size_t len, size_t size, hsort_options_t options)
+static hsort_merge_node_t *hsort_push(hsort_merge_node_t *top_node, void *array, size_t len, size_t size, hsort_options_t options)
 {
 	hsort_merge_node_t *node;
 
@@ -304,9 +304,9 @@ static void hsort_push(hsort_merge_node_t **top_node, void *array, size_t len, s
 	node->data.len     = len;
 	node->data.size    = size;
 	node->data.options = options;
-	node->next         = *top_node;
+	node->next         = top_node;
 
-	*top_node = node;
+	return node;
 }
 
 static void hsort_pop(hsort_merge_node_t **top_node)
@@ -574,7 +574,7 @@ static hsort_return_t hsort_merge(hsort_data_t *data, hsort_equality_cb cb)
 	if (tmp_arr == NULL)
 		return HSORT_RET_ERROR;
 
-	hsort_push(&top_node, data->array, data->len, data->size, data->options);
+	top_node = hsort_push(top_node, data->array, data->len, data->size, data->options);
 
 	while (top_node != NULL) {
 		if (top_node->step == HSORT_MERGE_RIGHT) {
@@ -589,14 +589,14 @@ static hsort_return_t hsort_merge(hsort_data_t *data, hsort_equality_cb cb)
 			top_node->step = HSORT_MERGE_RIGHT;
 			tmp_len        = top_node->data.len / 2;
 			if (tmp_len > 1)
-				hsort_push(&top_node, top_node->data.array + ((top_node->data.len + 1)/2) * data->size, tmp_len, data->size, data->options);
+				top_node = hsort_push(top_node, top_node->data.array + ((top_node->data.len + 1)/2) * data->size, tmp_len, data->size, data->options);
 
 		} else {
 			/* Start working on the left half, using the larger portion. */
 			top_node->step = HSORT_MERGE_LEFT;
 			tmp_len        = (top_node->data.len + 1) / 2;
 			if (tmp_len > 1)
-				hsort_push(&top_node, top_node->data.array, tmp_len, data->size, data->options);
+				top_node = hsort_push(top_node, top_node->data.array, tmp_len, data->size, data->options);
 		}
 	}
 

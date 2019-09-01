@@ -196,34 +196,18 @@ static void hsort_swap(void *a, void *b, size_t size)
 	memcpy( b,   &tmp, size);
 }
 
-static void hsort_insert(void *left, void *right, size_t size)
+static void hsort_insert(void *insert_this, void *insert_here, size_t size)
 {
-	u_int64_t     tmp = 0;
+	u_int64_t tmp = 0;
 
 	/* Store value that we are moving. */
-	hsort_swap(right, &tmp, size);
+	memcpy(&tmp, insert_this, size);
 
 	/* Shift the value at each index one to the right. */
-	while (right > left) {
-		switch (size) {
-			case 1:
-				*(u_int8_t *)right = *((u_int8_t *)(right) - 1);
-				break;
-			case 2:
-				*(u_int16_t *)right = *((u_int16_t *)(right) - 1);
-				break;
-			case 4:
-				*(u_int32_t *)right = *((u_int32_t *)(right) - 1);
-				break;
-			case 8:
-				*(u_int64_t *)right = *((u_int64_t *)(right) - 1);
-				break;
-		}
-		right -= size;
-	}
+	memmove(insert_here + size, insert_here, insert_this - insert_here);
 
 	/* Insert value in sorted place. */
-	hsort_swap(right, &tmp, size);
+	memcpy(insert_here, &tmp, size);
 }
 
 static void hsort_merge_subarrays(hsort_data_t *data, void *tmp_array)
@@ -546,11 +530,11 @@ static hsort_return_t hsort_insertion(hsort_data_t *data)
 	void         *j_ptr; /* Array position for j */
 
 	for (i = 1; i < data->len; i++) {
+		i_ptr = data->array + (data->size * i);
 		for (j = 0; j < i; j++) {
-			i_ptr = data->array + (data->size * i);
 			j_ptr = data->array + (data->size * j);
 			if (data->cb(i_ptr, j_ptr, data) == (data->options & HSORT_ORDER_ASC ? HSORT_LT : HSORT_GT)) {
-				hsort_insert(j_ptr, i_ptr, data->size);
+				hsort_insert(i_ptr, j_ptr, data->size);
 				break;
 			}
 		}

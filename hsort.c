@@ -16,12 +16,12 @@ typedef struct hsort_data {
 	bool             is_signed;
 } hsort_data_t;
 
-struct hsort_merge_node {
+typedef struct hsort_merge_node {
 	struct hsort_merge_node *next;
 	void                    *array;
 	size_t                   len;
 	enum hsort_merge_step    step;
-};
+} hsort_merge_node_t;
 
 
 /* --- CALLBACKS --- */
@@ -171,7 +171,7 @@ static void hsort_insert(void *left, void *right, size_t size)
 	hsort_swap(right, &tmp, size);
 }
 
-static void hsort_merge_subarrays(hsort_data_t *data, struct hsort_merge_node *top_node, void *tmp_array, hsort_equality_cb cb)
+static void hsort_merge_subarrays(hsort_data_t *data, hsort_merge_node_t *top_node, void *tmp_array, hsort_equality_cb cb)
 {
 	void   *head;
 	size_t  left_len;
@@ -220,9 +220,9 @@ static void hsort_merge_subarrays(hsort_data_t *data, struct hsort_merge_node *t
 	memcpy(top_node->array, head, top_node->len * data->size);
 }
 
-static void hsort_push(struct hsort_merge_node **top_node, void *array, size_t len)
+static void hsort_push(hsort_merge_node_t **top_node, void *array, size_t len)
 {
-	struct hsort_merge_node *node;
+	hsort_merge_node_t *node;
 
 	node = malloc(sizeof(*node));
 
@@ -234,9 +234,9 @@ static void hsort_push(struct hsort_merge_node **top_node, void *array, size_t l
 	*top_node = node;
 }
 
-static void hsort_pop(struct hsort_merge_node **top_node)
+static void hsort_pop(hsort_merge_node_t **top_node)
 {
-	struct hsort_merge_node *node;
+	hsort_merge_node_t *node;
 
 	node      = *top_node;
 	*top_node = (*top_node)->next;
@@ -487,9 +487,9 @@ static hsort_return_t hsort_selection(hsort_data_t *data, hsort_equality_cb cb)
 
 static hsort_return_t hsort_merge(hsort_data_t *data, hsort_equality_cb cb)
 {
-	struct hsort_merge_node *top_node = NULL;
-	void                    *tmp_arr;
-	size_t                   tmp_len;
+	hsort_merge_node_t *top_node = NULL;
+	void               *tmp_arr;
+	size_t              tmp_len;
 
 	tmp_arr = calloc(data->len, data->size);
 	if (tmp_arr == NULL)

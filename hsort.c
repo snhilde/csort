@@ -254,8 +254,8 @@ static void hsort_merge_subarrays(hsort_data_t *top_node, void *tmp_array, hsort
 	/* Keep a reference to the beginning of the temporary array. */
 	head = tmp_array;
 
-	left_len  = (top_node->len + 1) / 2; /* bigger half */
-	right_len = (top_node->len) / 2;     /* smaller half */
+	left_len  = top_node->len / 2;
+	right_len = top_node->len - left_len;
 
 	left_index  = top_node->array;
 	right_index = top_node->array + (left_len * top_node->size);
@@ -582,26 +582,53 @@ static hsort_return_t hsort_selection(hsort_data_t *data, hsort_equality_cb cb)
 	return HSORT_RET_SUCCESS;
 }
 
-static hsort_return_t hsort_merge(hsort_data_t *data, hsort_equality_cb cb)
+static hsort_return_t hsort_merge_by_recursion(hsort_data_t *data, void *tmp_array, hsort_equality_cb cb)
+{
+	hsort_data_t data_left;
+	hsort_data_t data_right;
+
+	if (data == NULL || tmp_array == NULL || cb == NULL)
+		return HSORT_RET_INVALIDUSE;
+
+	if (data->len == 1)
+		return HSORT_RET_SUCCESS;
+
+	data_left.array      = data->array;
+	data_left.len        = data->len / 2;
+	data_left.size       = data->size;
+	data_left.options    = data->options;
+	data_left.is_signed  = data->is_signed;
+
+	data_right.array     = data->array + (data_left.len * data->size);
+	data_right.len       = data->len - data->len / 2;
+	data_right.size      = data->size;
+	data_right.options   = data->options;
+	data_right.is_signed = data->is_signed;
+
+	hsort_merge_by_recursion(&data_left, tmp_array, cb);
+	hsort_merge_by_recursion(&data_right, tmp_array, cb);
+
+	hsort_merge_subarrays(data, tmp_array, cb);
+
+	return HSORT_RET_SUCCESS;
+}
+
+static hsort_return_t hsort_merge_by_stack(hsort_data_t *data, void *tmp_array, hsort_equality_cb cb)
 {
 	hsort_data_t *top_node = NULL;
-	void         *tmp_arr;
-	size_t       tmp_len;
+	size_t        tmp_len;
 
-	tmp_arr = calloc(data->len, data->size);
-	if (tmp_arr == NULL)
-		return HSORT_RET_ERROR;
+	if (data == NULL || tmp_array == NULL || cb == NULL)
+		return HSORT_RET_INVALIDUSE;
 
 	top_node = hsort_merge_create_stack(data);
-	if (top_node == NULL) {
-		free(tmp_arr);
+	if (top_node == NULL)
 		return HSORT_RET_ERROR;
-	}
 
 	while (top_node != NULL) {
 		if (top_node->step == HSORT_MERGE_HALVES) {
 			/* Both halves are sorted. Merge them together. */
-			hsort_merge_subarrays(top_node, tmp_arr, cb);
+			hsort_merge_subarrays(top_node, tmp_array, cb);
 
 			/* Merge is done. Remove it from stack and keep going. */
 			top_node = hsort_pop(top_node);
@@ -609,21 +636,39 @@ static hsort_return_t hsort_merge(hsort_data_t *data, hsort_equality_cb cb)
 		} else if (top_node->step == HSORT_DESCEND_RIGHT) {
 			/* Left half is done. Move to right half, using the smaller portion. */
 			top_node->step = HSORT_MERGE_HALVES;
-			tmp_len        = top_node->len / 2;
+			tmp_len        = top_node-> len - top_node->len / 2;
 			if (tmp_len > 1)
-				top_node = hsort_push(top_node, top_node->array + ((top_node->len + 1)/2) * top_node->size, tmp_len);
+				top_node = hsort_push(top_node, top_node->array + ((top_node->len / 2) * top_node->size), tmp_len);
 
 		} else {
-			/* Start working on the left half, using the larger portion. */
+			/* Start working on the left half. */
 			top_node->step = HSORT_DESCEND_RIGHT;
-			tmp_len        = (top_node->len + 1) / 2;
+			tmp_len        = top_node->len / 2;
 			if (tmp_len > 1)
 				top_node = hsort_push(top_node, top_node->array, tmp_len);
 		}
 	}
 
-	free(tmp_arr);
 	return HSORT_RET_SUCCESS;
+}
+
+static hsort_return_t hsort_merge(hsort_data_t *data, hsort_equality_cb cb)
+{
+	void           *tmp_array;
+	hsort_return_t  ret;
+
+	tmp_array = calloc(data->len, data->size);
+	if (tmp_array == NULL)
+		return HSORT_RET_ERROR;
+
+	if (data->options & HSORT_MERGE_SORT_RECURSE) {
+		ret = hsort_merge_by_recursion(data, tmp_array, cb);
+	} else {
+		ret = hsort_merge_by_stack(data, tmp_array, cb);
+	}
+
+	free(tmp_array);
+	return ret;
 }
 
 

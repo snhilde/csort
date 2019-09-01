@@ -191,28 +191,9 @@ static void hsort_swap(void *a, void *b, size_t size)
 {
 	u_int64_t tmp;
 
-	switch (size) {
-		case 1:
-			tmp            = *(u_int8_t *)b;
-			*(u_int8_t *)b = *(u_int8_t *)a;
-			*(u_int8_t *)a = tmp;
-			break;
-		case 2:
-			tmp             = *(u_int16_t *)b;
-			*(u_int16_t *)b = *(u_int16_t *)a;
-			*(u_int16_t *)a = tmp;
-			break;
-		case 4:
-			tmp             = *(u_int32_t *)b;
-			*(u_int32_t *)b = *(u_int32_t *)a;
-			*(u_int32_t *)a = tmp;
-			break;
-		case 8:
-			tmp             = *(u_int64_t *)b;
-			*(u_int64_t *)b = *(u_int64_t *)a;
-			*(u_int64_t *)a = tmp;
-			break;
-	}
+	memcpy(&tmp,  a,   size);
+	memcpy( a,    b,   size);
+	memcpy( b,   &tmp, size);
 }
 
 static void hsort_insert(void *left, void *right, size_t size)

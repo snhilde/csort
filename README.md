@@ -26,10 +26,10 @@ API for various sorting algorithms
 
 |                   | Normal color     | Warning color        | Error color       |
 | ----------------- | ---------------- | -------------------- | ----------------- |
-| Battery routine   | 26 - 100 % left  | 11 - 25 % left       | 0 - 10 % left     |
-| CPU temp routine  | < 75 °C          | 75 - 100 °C          | > 100 °C          |
-| CPU usage routine | 0 - 74 %         | 75 - 89 %            | 90 - 100 %        |
-| Disk routine¹     | 0 - 74 % full    | 75 - 89 % full       | 90 - 100 % full   |
+| hsort_return_t | 26 - 100 % left  | 11 - 25 % left       | 0 - 10 % left     |
+| hsort_return_t | < 75 °C          | 75 - 100 °C          | > 100 °C          |
+| hsort_return_t | 0 - 74 %         | 75 - 89 %            | 90 - 100 %        |
+| hsort_return_t | 0 - 74 % full    | 75 - 89 % full       | 90 - 100 % full   |
 | Fan routine       | 0 - 74 % max     | 75 - 89 % max        | 90 - 100 % max    |
 | Load routine      | all loads < 1    | any load >= 1        | any load >= 2     |
 | Network routine   | both speeds <= K | either speed = M     | either speed > M  |

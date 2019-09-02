@@ -11,8 +11,8 @@ API for various sorting algorithms
 ### Sorting Functions
 * [Sort signed array](#hsort_sort_int_array)
 * [Sort unsigned array](#hsort_sort_uint_array)
-* [Sort characters in a string](hsort_sort_str)
-* [Sort array with custom comparision callback](hsort_sort_custom)
+* [Sort characters in a string](#hsort_sort_str)
+* [Sort array with custom comparision callback](#hsort_sort_custom)
 
 ### Function Descriptions
 

@@ -17,7 +17,7 @@ API for various sorting algorithms
 ### Function Descriptions
 
 | Test 1         |                           |
-| -------------- | ------------------------- | -------------------------------------------------------------------------
+| -------------- | ------------------------- | ------------------------------------------------------------------------- |
 | hsort_return_t | **hsort_sort_int_array**  | void *array, size_t len, size_t size, hsort_options_t options
 | hsort_return_t | **hsort_sort_uint_array** | void *array, size_t len, size_t size, hsort_options_t options
 | hsort_return_t | **hsort_sort_str**        | char *str, hsort_options_t options

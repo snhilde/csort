@@ -26,10 +26,10 @@ API for various sorting algorithms
 
 | Return type       | Function name    | Warning color        | Error color       |
 | :---------------- | ---------------- | -------------------- | ----------------- |
-| hsort_return_t | **hsort_sort_int_array**  | 11 - 25 % left       | 0 - 10 % left     |
-| hsort_return_t | **hsort_sort_uint_array** | 75 - 100 °C          | > 100 °C          |
-| hsort_return_t | **hsort_sort_str**        | 75 - 89 %            | 90 - 100 %        |
-| hsort_return_t | **hsort_sort_custom**     | 75 - 89 % full       | 90 - 100 % full   |
+| hsort_return_t | **hsort_sort_int_array**  | void *array, size_t len, size_t size, hsort_options_t options |
+| hsort_return_t | **hsort_sort_uint_array** | void *array, size_t len, size_t size, hsort_options_t options |
+| hsort_return_t | **hsort_sort_str**        | char *str, hsort_options_t options |
+| hsort_return_t | **hsort_sort_custom**     | void *array, size_t len, size_t size, hsort_options_t options, bool is_signed, hsort_equality_cb cb |
 | Fan routine       | 0 - 74 % max     | 75 - 89 % max        | 90 - 100 % max    |
 | Load routine      | all loads < 1    | any load >= 1        | any load >= 2     |
 | Network routine   | both speeds <= K | either speed = M     | either speed > M  |

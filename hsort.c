@@ -286,8 +286,10 @@ static hsort_return_t hsort_insertion(hsort_data_t *data)
 {
 	/* Starting with the second item in the array and iterating until the end, insert the item
  	 * in the preceding subarray at the position where the value before is less than (or greater than,
-	 * if sorting in descending order) the item's value and the value after is greater (is less).
+	 * if sorting in descending order) the item's value and the value after is greater (or less).
 	 * E.g. j < i < next item
+	 * We are going to find the insertion point with a binary search to decrease the time complexity
+	 * from O(n^2) to O(n lgn).
 	 *
 	 * Loop invariant:
 	 *   Initialization: The first value is sorted by default and untouched.
@@ -296,32 +298,57 @@ static hsort_return_t hsort_insertion(hsort_data_t *data)
 	 *                   on the left) will have grown to be the entire array, leaving the main
 	 *                   array in sorted array.
  	 */
-	unsigned int  i;     /* Current item being inserted into the preceding subarray */
-	unsigned int  j;     /* Item being checked to determine insertion point for i */
-	void         *i_ptr; /* Array position for i */
-	void         *j_ptr; /* Array position for j */
-	u_int64_t     tmp;
+	unsigned int      i;               /* Current item being inserted into the preceding subarray */
+	void             *i_ptr;           /* Array position for i */
+	unsigned int      min_index;       /* During binary search, leftmost index of subarray being searched */
+	unsigned int      max_index;       /* During binary search, rightmost index of subarray being searched */
+	unsigned int      midpoint;        /* During binary search, middle of subarray being searched and the
+	                                * value used for comparison to decide which branch to descend */
+	hsort_equality_t  cmp_ret;
+	unsigned int      insertion_index; /* The final value where we will insert the value. */
+	void             *insertion_ptr; /* Array position for j */
+	u_int64_t         tmp;
 
 	for (i = 1; i < data->len; i++) {
 		i_ptr = data->array + (data->size * i);
-		for (j = 0; j < i; j++) {
-			j_ptr = data->array + (data->size * j);
-			if (data->cb(i_ptr, j_ptr, data) == (data->options & HSORT_ORDER_ASC ? HSORT_LT : HSORT_GT)) {
-				/* We found a place. Let's insert the value. */
 
-				/* Store value that we are moving. */
-				tmp = 0;
-				memcpy(&tmp, i_ptr, data->size);
+		/* Reset binary search. */
+		min_index = 0;
+		max_index = i - 1;
 
-				/* Shift the value at each index one to the right. */
-				memmove(j_ptr + data->size, j_ptr, (i - j) * data->size);
-
-				/* Insert value into place. */
-				memcpy(j_ptr, &tmp, data->size);
-
-				break;
-			}
+		/* Narrow down the subarray until we find the correct insertion point. */
+		while (min_index != max_index) {
+			midpoint = (min_index + max_index) / 2;
+			cmp_ret  = data->cb(i_ptr, data->array + (midpoint * data->size), data);
+			if (cmp_ret == HSORT_EQ)
+				/* Force an exit with the correct value. */
+				min_index = max_index = midpoint;
+			else if (cmp_ret == (data->options & HSORT_ORDER_ASC ? HSORT_LT : HSORT_GT))
+				/* Descend down the left branch. */
+				max_index = midpoint;
+			else
+				/* Descend down the right branch. */
+				min_index = midpoint + 1;
 		}
+		/* Store the insertion point. */
+		insertion_index = min_index;
+		insertion_ptr   = data->array + (insertion_index * data->size);
+
+		/* If our value in question is larger (or smaller) than the entire array, we don't
+ 		 * need to do anything to insert it into sorted order. */
+		cmp_ret = data->cb(i_ptr, insertion_ptr, data);
+		if (insertion_index == i-1 && cmp_ret == (data->options & HSORT_ORDER_ASC ? HSORT_GT : HSORT_LT))
+			continue;
+
+		/* Store the value that we are moving. */
+		tmp = 0;
+		memcpy(&tmp, i_ptr, data->size);
+
+		/* Shift the value at each index one to the right. */
+		memmove(insertion_ptr + data->size, insertion_ptr, (i - insertion_index) * data->size);
+
+		/* Insert value into place. */
+		memcpy(insertion_ptr, &tmp, data->size);
 	}
 
 	return HSORT_RET_SUCCESS;

@@ -19,7 +19,7 @@ API for various sorting algorithms
 | Return         | Function                                                | Arguments                                                                                            |
 | :------------- | :------------------------------------------------------ | :--------------------------------------------------------------------------------------------------- |
 | hsort_return_t | <a name=hsort_sort_int_array></a>hsort_sort_int_array   | void \*array, size_t len, size_t size, hsort_options_t options                                       |
-Description
+| Description that is very long and spans multiple cells |
 
 | Return         | Function                                                | Arguments                                                                                            |
 | :------------- | :------------------------------------------------------ | :--------------------------------------------------------------------------------------------------- |

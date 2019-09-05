@@ -18,7 +18,7 @@ API for various sorting algorithms
 
 | Return         | Function                                                | Arguments                                                                                            |
 | :------------- | :------------------------------------------------------ | :--------------------------------------------------------------------------------------------------- |
-| hsort_return_t | <a name=hsort_sort_int_array></a>hsort_sort_int_array   | void \*array, size_t len, size_t size, hsort_options_t options                                       | <br/> Description |
+| hsort_return_t | <a name=hsort_sort_int_array></a>hsort_sort_int_array   | void \*array, size_t len, size_t size, hsort_options_t options                                        <br/> Description |
 | hsort_return_t | <a name=hsort_sort_uint_array></a>hsort_sort_uint_array | void \*array, size_t len, size_t size, hsort_options_t options                                       |
 | hsort_return_t | <a name=hsort_sort_str></a>hsort_sort_str               | char \*str, hsort_options_t options                                                                  |
 | hsort_return_t | <a name=hsort_sort_custom></a>hsort_sort_custom         | void \*array, size_t len, size_t size, hsort_options_t options, bool is_signed, hsort_equality_cb cb |

@@ -35,7 +35,7 @@ Library for various sorting algorithms
 | :------------------------------------------------------------------------------------------------------------------ |
 | `hsort_return_t hsort_sort_str(char *str, hsort_options_t options)`
 | Sort a string of character
-| <table<tbody><tr><td> str</td><td>string to be sorted by character</td></tr><tr><td>options</td><td>hsort_options_t to specify various aspects</td></tr></tbody></table>
+| <table><tbody><tr><td>str</td><td>string to be sorted by character</td></tr><tr><td>options</td><td>hsort_options_t to specify various aspects</td></tr></tbody></table>
 | Returns HSORT_RET_SUCCESS on success, other hsort_return_t on failure
 
 |  <a name=sort_array_with_custom_comparison_callback></a>Sort array with custom comparison callback

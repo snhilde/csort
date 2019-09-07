@@ -20,13 +20,8 @@ Library for various sorting algorithms
 | :------------------------------------------------------------------------------------------------------------------ |
 | `hsort_return_t hsort_sort_int_array(void *array, size_t len, size_t size, hsort_options_t options)`
 | Description:
-| Arguments:<br/>
-|   array:<br/>
-|   len:<br/>
-|   size:<br/>
-|   options:<br/>
-| Return:<br/>
-|   HSORT_RET_SUCCESS on success, other hsort_return_t on failure
+| Arguments:<br/>   array:<br/>   len:<br/>   size:<br/>   options:<br/>
+| Return:<br/>   HSORT_RET_SUCCESS on success, other hsort_return_t on failure
 
 
 |  <a name=sort_unsigned_array></a>Sort unsigned array

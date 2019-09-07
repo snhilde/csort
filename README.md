@@ -20,7 +20,7 @@ Library for various sorting algorithms
 | :------------------------------------------------------------------------------------------------------------------ |
 | `hsort_return_t hsort_sort_int_array(void *array, size_t len, size_t size, hsort_options_t options)`
 | Sort an array of signed integers
-| **Arguments**:<br/><ul><li>array: array to be sorted</li><li>len: len of array (number of members)</li><li>size: size in bytes of each member</li><li>options: hsort_options_t to specify various aspects</li></ul>
+| **Arguments**<br/><ul><li>array: array to be sorted</li><li>len: len of array (number of members)</li><li>size: size in bytes of each member</li><li>options: hsort_options_t to specify various aspects</li></ul>
 | Returns HSORT_RET_SUCCESS on success, other hsort_return_t on failure
 
 
@@ -28,19 +28,19 @@ Library for various sorting algorithms
 | :------------------------------------------------------------------------------------------------------------------ |
 | `hsort_return_t hsort_sort_uint_array(void *array, size_t len, size_t size, hsort_options_t options)`
 | Sort an array of unsigned integers
-| <ul><li>array: array to be sorted</li><li>len: len of array (number of members)</li><li>size: size in bytes of each member</li><li>options: hsort_options_t to specify various aspects</li></ul>
+| **Arguments**<ul><li>array: array to be sorted</li><li>len: len of array (number of members)</li><li>size: size in bytes of each member</li><li>options: hsort_options_t to specify various aspects</li></ul>
 | Returns HSORT_RET_SUCCESS on success, other hsort_return_t on failure
 
 |  <a name=sort_characters_in_a_string></a>Sort characters in a string
 | :------------------------------------------------------------------------------------------------------------------ |
 | `hsort_return_t hsort_sort_str(char *str, hsort_options_t options)`
 | Sort a string of character
-| <ul><li> str: string to be sorted by character</li><li>options: hsort_options_t to specify various aspects</li></ul>
+| **Arguments**<ul><li> str: string to be sorted by character</li><li>options: hsort_options_t to specify various aspects</li></ul>
 | Returns HSORT_RET_SUCCESS on success, other hsort_return_t on failure
 
 |  <a name=sort_array_with_custom_comparison_callback></a>Sort array with custom comparison callback
 | :------------------------------------------------------------------------------------------------------------------ |
 | `hsort_return_t hsort_sort_custom(void *array, size_t len, size_t size, hsort_options_t options, bool is_signed, hsort_equality_cb cb)`
 | Sort an array of any data type using the specified comparison callback
-| <ul><li>array: array to be sorted</li><li>len: len of array (number of members)</li><li>size: size in bytes of each member</li><li>options: hsort_options_t to specify various aspects</li><li>is_signed: true if data type is signed, otherwise false</li><li>cb: custom callback to use for comparing members</li></ul>
+| **Arguments**<ul><li>array: array to be sorted</li><li>len: len of array (number of members)</li><li>size: size in bytes of each member</li><li>options: hsort_options_t to specify various aspects</li><li>is_signed: true if data type is signed, otherwise false</li><li>cb: custom callback to use for comparing members</li></ul>
 | Returns HSORT_RET_SUCCESS on success, other hsort_return_t on failure

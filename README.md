@@ -34,6 +34,9 @@ Library for various sorting algorithms
 |  <a name=sort_characters_in_a_string></a>Sort characters in a string
 | :------------------------------------------------------------------------------------------------------------------ |
 | `hsort_return_t hsort_sort_str(char *str, hsort_options_t options)`
+| Sort a string of character
+| str: string to be sorted by character<br/>options: hsort_options_t to specify various aspects<br/>
+| Returns HSORT_RET_SUCCESS on success, other hsort_return_t on failure
 
 |  <a name=sort_array_with_custom_comparison_callback></a>Sort array with custom comparison callback
 | :------------------------------------------------------------------------------------------------------------------ |

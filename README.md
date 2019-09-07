@@ -27,6 +27,9 @@ Library for various sorting algorithms
 |  <a name=sort_unsigned_array></a>Sort unsigned array
 | :------------------------------------------------------------------------------------------------------------------ |
 | `hsort_return_t hsort_sort_uint_array(void *array, size_t len, size_t size, hsort_options_t options)`
+| Sort an array of unsigned integers
+| array: array to be sorted<br/>len: len of array (number of members)<br/>size: size in bytes of each member<br/>options: hsort_options_t to specify various aspects<br/>
+| Returns HSORT_RET_SUCCESS on success, other hsort_return_t on failure
 
 |  <a name=sort_characters_in_a_string></a>Sort characters in a string
 | :------------------------------------------------------------------------------------------------------------------ |

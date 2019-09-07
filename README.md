@@ -19,9 +19,14 @@ Library for various sorting algorithms
 |  <a name=sort_signed_array></a>Sort signed array
 | :------------------------------------------------------------------------------------------------------------------ |
 | `hsort_return_t hsort_sort_int_array(void *array, size_t len, size_t size, hsort_options_t options)`
-| Argument <br/>arg 1
-|   * 2
-| Description that is very long and has its own cell
+| Description:
+| Arguments:<br/>
+|   array:<br/>
+|   len:<br/>
+|   size:<br/>
+|   options:<br/>
+| Return:<br/>
+|   HSORT_RET_SUCCESS on success, other hsort_return_t on failure
 
 
 |  <a name=sort_unsigned_array></a>Sort unsigned array

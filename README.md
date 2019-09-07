@@ -44,4 +44,8 @@ Library for various sorting algorithms
 | Sort an array of any data type using the specified comparison callback
 | **Arguments**<ul><li>array: array to be sorted</li><li>len: len of array (number of members)</li><li>size: size in bytes of each member</li><li>options: hsort_options_t to specify various aspects</li><li>is_signed: true if data type is signed, otherwise false</li><li>cb: custom callback to use for comparing members</li></ul>
 | Returns HSORT_RET_SUCCESS on success, other hsort_return_t on failure
-| <table><tbody><tr><th>Arguments</th></tr><td>array</td><td>array to be sorted</td></tbody></table>
+| <table><tbody>
+    <tr><th>Arguments</th></tr>
+    <td>array</td>
+    <td>array to be sorted</td>
+  </tbody></table>

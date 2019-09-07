@@ -41,3 +41,6 @@ Library for various sorting algorithms
 |  <a name=sort_array_with_custom_comparison_callback></a>Sort array with custom comparison callback
 | :------------------------------------------------------------------------------------------------------------------ |
 | `hsort_return_t hsort_sort_custom(void *array, size_t len, size_t size, hsort_options_t options, bool is_signed, hsort_equality_cb cb)`
+| Sort an array of any data type using the specified comparison callback
+| array: array to be sorted<br/>len: len of array (number of members)<br/>size: size in bytes of each member<br/>options: hsort_options_t to specify various aspects<br/>is_signed: true if data type is signed, otherwise false<br/>cb: custom callback to use for comparing members
+| Returns HSORT_RET_SUCCESS on success, other hsort_return_t on failure

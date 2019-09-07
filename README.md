@@ -1,5 +1,5 @@
 # hsort
-API for various sorting algorithms
+Library for various sorting algorithms
 
 ## Currently supported algorithms
 * Insertion Sort
@@ -9,37 +9,29 @@ API for various sorting algorithms
 ## API
 
 ### Sorting Functions
-* [Sort signed array](#hsort_sort_int_array)
-* [Sort unsigned array](#hsort_sort_uint_array)
-* [Sort characters in a string](#hsort_sort_str)
-* [Sort array with custom comparision callback](#hsort_sort_custom)
+* [Sort signed array](#sort_signed_array)
+* [Sort unsigned array](#sort_unsigned_array)
+* [Sort characters in a string](#sort_characters_in_a_string)
+* [Sort array with custom comparison callback](#sort_array_with_custom_comparison_callback)
 
 ### Function Descriptions
 
-|  <a name=hsort_sort_int_array></a> hsort_sort_int_array                                                                                  |
+|  <a name=sort_signed_array></a>Sort signed array
 | :--------------------------------------------------------------------------------------------------------------------------------------- |
 | `hsort_return_t hsort_sort_int_array(void *array, size_t len, size_t size, hsort_options_t options)` |
 | Argument <br/>arg 1
 |   * 2
 | Description that is very long and has its own cell                                                                                       |
 
-| Return         | Function                                                | Arguments                                                                                            |
-| :------------- | :------------------------------------------------------ | :--------------------------------------------------------------------------------------------------- |
-| hsort_return_t | <a name=hsort_sort_int_array></a>hsort_sort_int_array   | void \*array, size_t len, size_t size, hsort_options_t options                                       |
 
-Description that is very long and spans multiple cells
+|  <a name=sort_unsigned_array></a>Sort unsigned array
+| :--------------------------------------------------------------------------------------------------------------------------------------- |
+| `hsort_return_t hsort_sort_uint_array(void *array, size_t len, size_t size, hsort_options_t options)` |
 
-| Return         | Function                                                | Arguments                                                                                            |
-| :------------- | :------------------------------------------------------ | :--------------------------------------------------------------------------------------------------- |
-| hsort_return_t | <a name=hsort_sort_uint_array></a>hsort_sort_uint_array | void \*array, size_t len, size_t size, hsort_options_t options                                       |
-Description
+|  <a name=sort_characters_in_a_string></a>Sort characters in a string
+| :--------------------------------------------------------------------------------------------------------------------------------------- |
+| `hsort_return_t hsort_sort_str(char *str, hsort_options_t options)` |
 
-| Return         | Function                                                | Arguments                                                                                            |
-| :------------- | :------------------------------------------------------ | :--------------------------------------------------------------------------------------------------- |
-| hsort_return_t | <a name=hsort_sort_str></a>hsort_sort_str               | char \*str, hsort_options_t options                                                                  |
-Description
-
-| Return         | Function                                                | Arguments                                                                                            |
-| :------------- | :------------------------------------------------------ | :--------------------------------------------------------------------------------------------------- |
-| hsort_return_t | <a name=hsort_sort_custom></a>hsort_sort_custom         | void \*array, size_t len, size_t size, hsort_options_t options, bool is_signed, hsort_equality_cb cb |
-Description
+|  <a name=sort_array_with_custom_comparison_callback></a>Sort array with custom comparison callback
+| :--------------------------------------------------------------------------------------------------------------------------------------- |
+| `hsort_return_t hsort_sort_custom(void *array, size_t len, size_t size, hsort_options_t options, bool is_signed, hsort_equality_cb cb)` |

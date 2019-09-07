@@ -20,7 +20,7 @@ Library for various sorting algorithms
 | :------------------------------------------------------------------------------------------------------------------ |
 | `hsort_return_t hsort_sort_int_array(void *array, size_t len, size_t size, hsort_options_t options)`
 | Sort an array of signed integers
-| Arguments:<br/><ul><li>array: array to be sorted</li><li>len: len of array (number of members)</li><li>size: size in bytes of each member</li><li>options: hsort_options_t to specify various aspects</li></ul>
+| *Arguments*:<br/><ul><li>array: array to be sorted</li><li>len: len of array (number of members)</li><li>size: size in bytes of each member</li><li>options: hsort_options_t to specify various aspects</li></ul>
 | Returns HSORT_RET_SUCCESS on success, other hsort_return_t on failure
 
 
